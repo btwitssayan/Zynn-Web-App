@@ -8,3 +8,4 @@ dist
 .impeccable/
 .claude/settings.local.json
 .impeccable/hook.cache.json
+.vercel
