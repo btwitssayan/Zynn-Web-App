@@ -1,0 +1,10 @@
+node_modules
+dist
+*.local
+.DS_Store
+.agents/
+.claude/
+.codex/
+.impeccable/
+.claude/settings.local.json
+.impeccable/hook.cache.json
