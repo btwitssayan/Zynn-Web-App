@@ -3,6 +3,7 @@ import { PRODUCTS } from '../data/products'
 import { inr2 } from '../lib/format'
 import { useApp } from '../store/AppStore'
 import { Icon } from './Icon'
+import { LiquidGlass } from './ui/liquid-glass'
 import { BottomSheet } from './Overlays'
 import { StoreOptionRow } from './StoreOptionRow'
 
@@ -19,13 +20,12 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
         <div className={`ph relative h-[220px] text-[13px] ${p.image ? 'p-0' : 'p-12'}`}>
           {p.image ? <img src={p.image} alt={p.title} className="absolute inset-0 h-full w-full object-cover" /> : p.title}
           <div className="absolute top-2 left-1/2 h-[5px] w-10 -translate-x-1/2 rounded bg-[#D0D0D5]" />
-          <button
-            className="rb absolute top-3.5 right-3.5 border border-white/50 bg-[rgba(60,60,67,.32)] text-white"
-            aria-label="Close"
-            onClick={onClose}
-          >
-            <Icon name="close" />
-          </button>
+          {/* Floats over the product photo, where refraction reads best. */}
+          <LiquidGlass press className="!absolute top-3.5 right-3.5 h-11 w-11" tint="rgba(60,60,67,.18)" frost={0.4}>
+            <button className="rb h-full w-full text-white" aria-label="Close" onClick={onClose}>
+              <Icon name="close" />
+            </button>
+          </LiquidGlass>
         </div>
 
         <div className="px-5 pt-[18px] pb-6">
@@ -131,14 +131,16 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
         </div>
 
         <div className="sticky bottom-0 flex justify-end px-5 pb-6">
-          <Link
-            to={`/chat?p=${id}`}
-            onClick={onClose}
-            className="g flex h-12 items-center gap-2 rounded-full bg-[rgba(30,30,34,.85)] px-5 text-[15px] font-semibold text-z-tx"
-          >
-            <Icon name="arrowRight" />
-            Follow up
-          </Link>
+          <LiquidGlass press className="h-12" tint="rgba(30,30,34,.55)" frost={0.6}>
+            <Link
+              to={`/chat?p=${id}`}
+              onClick={onClose}
+              className="flex h-full items-center gap-2 px-5 text-[15px] font-semibold text-z-tx"
+            >
+              <Icon name="arrowRight" />
+              Follow up
+            </Link>
+          </LiquidGlass>
         </div>
       </div>
     </BottomSheet>

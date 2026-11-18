@@ -13,10 +13,12 @@
   --color-z-err: #e5807a;
   --color-z-heart: #ff4d61;
   --color-z-line: #3a3a3e;
-  --font-sans: Inter, system-ui, sans-serif;
-  --font-tight: "Inter Tight", Inter, system-ui, sans-serif;
-  --font-serif: "Instrument Serif", Georgia, serif;
-  --font-logo: "Playfair Display", Georgia, serif;
+  /* San Francisco everywhere. -apple-system picks SF Text / SF Display by
+     size automatically; other platforms fall back to their system UI font
+     (SF can't be licensed for web serving). */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", system-ui, sans-serif;
+  --font-tight: var(--font-sans);
+  --font-serif: var(--font-sans);
 }
 
 @property --za {
@@ -92,7 +94,6 @@
     overflow-x: clip;
     isolation: isolate;
     background:
-      radial-gradient(460px 460px at 104% -4%, rgba(240, 138, 60, 0.16), transparent 70%),
       radial-gradient(460px 460px at -6% 400px, rgba(152, 165, 216, 0.12), transparent 70%),
       #0b0b0d;
     color: #ededef;
@@ -156,6 +157,29 @@
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
   }
+  /* Liquid glass (components/ui/liquid-glass.tsx): reserved for the floating
+     control layer. A bright top edge and hairline catch light on the rim;
+     the outer shadow lifts the lens off content. */
+  .lg {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 12px 32px rgba(0, 0, 0, 0.45);
+    transition:
+      transform 160ms var(--ease-out),
+      box-shadow 180ms var(--ease-out);
+  }
+  /* Press feedback lives on the lens, on pointer-down. */
+  .lg-press:active {
+    transform: scale(0.92);
+  }
+  .lg .rb:active:not(:disabled) {
+    transform: none;
+  }
+  /* The composer's gradient ring draws inside the lens edge (lens clips). */
+  .lg > .cb::before {
+    inset: 0;
+  }
   .rb {
     width: 44px;
     height: 44px;
@@ -183,17 +207,9 @@
     flex: none;
   }
   .logo {
-    font: 900 26px var(--font-logo);
-    letter-spacing: -0.5px;
-    line-height: 1;
-    background: var(--z-grad);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .logo small {
-    font-size: 13px;
-    letter-spacing: 0;
+    display: block;
+    flex: none;
+    user-select: none;
   }
 
   /* ---------- Type ---------- */
@@ -668,8 +684,8 @@
     color: #ededef;
   }
   .hd i {
-    font: italic 400 35px/34px var(--font-serif);
-    letter-spacing: -0.01em;
+    font: italic 800 32px/34px var(--font-sans);
+    letter-spacing: -0.03em;
     background: var(--z-grad);
     -webkit-background-clip: text;
     background-clip: text;
@@ -1017,7 +1033,8 @@
   .cbar-field:focus-within {
     border-color: rgba(242, 163, 94, 0.55);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
+      inset 0 0 0 1px rgba(242, 163, 94, 0.55),
       0 12px 32px rgba(0, 0, 0, 0.45),
       0 0 0 3px rgba(242, 163, 94, 0.15);
   }

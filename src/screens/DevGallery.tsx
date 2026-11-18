@@ -217,7 +217,7 @@ export default function DevGallery() {
             <h1 className="hd">
               Saved for <i>later</i>
             </h1>
-            <p className="sb">Headline: Inter Tight 800, 32px, −0.03em. One word in Instrument Serif Italic with the logo gradient.</p>
+            <p className="sb">Headline: SF 800, 32px, −0.03em. One word in SF Italic with the logo gradient.</p>
             <div className="g mt-4 inline-flex h-12 items-center gap-2.5 rounded-full bg-[rgba(40,40,44,.85)] px-[18px] text-sm font-semibold">
               <Icon name="wifiOff" className="text-z-err" />
               No internet connection.

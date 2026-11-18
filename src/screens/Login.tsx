@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router'
+import CodeSlots from '../components/CodeSlots'
 import { TopBar } from '../components/TopBar'
 import { formatPhone, maskPhone } from '../lib/format'
 import { useApp } from '../store/AppStore'
@@ -55,10 +56,10 @@ export function LoginOtp() {
   const nav = useNavigate()
   const { state } = useLocation()
   const phone = (state as { phone?: string } | null)?.phone
-  const [code, setCode] = useState<string[]>(Array(LEN).fill(''))
+  const [code, setCode] = useState('')
   const [error, setError] = useState(false)
+  const [success, setSuccess] = useState(false)
   const [wait, setWait] = useState(24)
-  const refs = useRef<(HTMLInputElement | null)[]>([])
 
   useEffect(() => {
     if (wait <= 0) return
@@ -66,44 +67,24 @@ export function LoginOtp() {
     return () => clearTimeout(t)
   }, [wait])
 
+  useEffect(() => {
+    if (!success) return
+    const t = setTimeout(() => nav('/', { replace: true }), 700)
+    return () => clearTimeout(t)
+  }, [nav, success])
+
   if (!phone) return <Navigate to="/login" replace />
-
-  const value = code.join('')
-  const focus = (i: number) => refs.current[Math.max(0, Math.min(LEN - 1, i))]?.focus()
-
-  const setDigit = (i: number, d: string) => {
-    setError(false)
-    setCode((c) => c.map((x, k) => (k === i ? d : x)))
-    if (d) focus(i + 1)
-  }
-
-  const onKey = (i: number, e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !code[i]) focus(i - 1)
-    if (e.key === 'ArrowLeft') focus(i - 1)
-    if (e.key === 'ArrowRight') focus(i + 1)
-  }
-
-  const onPaste = (e: ClipboardEvent) => {
-    const d = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, LEN)
-    if (!d) return
-    e.preventDefault()
-    setError(false)
-    setCode(Array.from({ length: LEN }, (_, k) => d[k] ?? ''))
-    focus(d.length)
-  }
 
   const verify = () => {
     // Demo rule: 000000 simulates a wrong code; any other 6 digits logs in.
-    if (value === '000000') {
+    if (code === '000000') {
       setError(true)
       return
     }
     app.login(phone)
     app.toast("You're logged in")
-    nav('/', { replace: true })
+    setSuccess(true)
   }
-
-  const nextEmpty = code.findIndex((c) => !c)
 
   return (
     <div className="scr">
@@ -116,28 +97,31 @@ export function LoginOtp() {
             Change
           </Link>
         </p>
-        <div className="mt-7 flex gap-2.5" onPaste={onPaste}>
-          {code.map((d, i) => (
-            <input
-              key={i}
-              ref={(el) => {
-                refs.current[i] = el
+          <div className="mt-7">
+            <CodeSlots
+              length={LEN}
+              value={code}
+              status={success ? 'success' : error ? 'error' : 'idle'}
+              onChange={(next: string) => {
+                setCode(next)
+                if (error) setError(false)
               }}
-              autoFocus={i === 0}
-              className={`in h-[58px] w-[46px] p-0 text-center text-[22px] font-bold ${error ? 'bad' : i === nextEmpty ? 'on' : ''}`}
-              value={d}
-              inputMode="numeric"
-              autoComplete={i === 0 ? 'one-time-code' : 'off'}
-              aria-label={`OTP digit ${i + 1}`}
-              onChange={(e) => setDigit(i, e.target.value.replace(/\D/g, '').slice(-1))}
-              onKeyDown={(e) => onKey(i, e)}
+              autoFocus
+              accentColor="#f5f5f5"
+              inkColor="#f5f5f5"
+              slotColor="#27272a"
+              digitColor="#18181b"
+              dangerColor="#e5807a"
+              slotSize={44}
+              gap={8}
+              radius={12}
+              ariaLabel="One-time password"
             />
-          ))}
-        </div>
-        {error && (
-          <p className="err mt-3 text-[13px]" role="alert">
-            That OTP is incorrect. Try again.
-          </p>
+          </div>
+          {error && (
+            <p className="err mt-3 text-[13px]" role="alert">
+              That OTP is incorrect. Try again.
+            </p>
         )}
         {wait > 0 ? (
           <p className="s mt-4">Resend in 0:{String(wait).padStart(2, '0')}</p>
@@ -152,7 +136,7 @@ export function LoginOtp() {
             Resend OTP
           </button>
         )}
-        <button className="btn w mt-7" disabled={value.length < LEN} onClick={verify}>
+        <button className="btn w mt-7" disabled={code.length < LEN || success} onClick={verify}>
           Verify
         </button>
       </div>

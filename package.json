@@ -10,11 +10,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@hugeicons/core-free-icons": "^4.4.0",
+    "@hugeicons/react": "^1.1.10",
     "@lottiefiles/dotlottie-react": "^0.22.2",
-    "motion": "^14.14.0",
+    "clsx": "^2.1.1",
+    "input-otp": "^1.5.0",
+    "motion": "^12.43.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router": "^7.18.5",
+    "tailwind-merge": "^3.7.0",
     "vaul": "^1.1.2"
   },
   "devDependencies": {

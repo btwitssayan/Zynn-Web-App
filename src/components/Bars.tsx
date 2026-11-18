@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { Icon } from './Icon'
+import { LiquidGlass } from './ui/liquid-glass'
 
 const EASE = [0.32, 0.72, 0, 1] as const
 const EASE_OUT = [0.23, 1, 0.32, 1] as const
@@ -161,30 +162,35 @@ export function ChatBar({ hints, onSubmit, disabled, gradient }: ChatBarProps) {
       className="flex w-full items-center gap-2.5 transition-opacity duration-200 ease-out"
       style={{ opacity: disabled ? 0.5 : 1 }}
     >
-      <label
-        className={`cbar-field g flex min-w-0 flex-1 items-center gap-3 ${
-          gradient ? 'cb' : 'h-11 rounded-full bg-[rgba(30,30,34,.78)] px-3.5'
-        }`}
+      {/* Dark tint keeps placeholder and typed text legible over busy content. */}
+      <LiquidGlass className="cbar-field h-11 min-w-0 flex-1" tint="rgba(30,30,34,.5)" frost={0.6}>
+        <label
+          className={`flex h-full w-full items-center gap-3 ${
+            gradient ? 'cb !bg-transparent' : 'rounded-full px-3.5'
+          }`}
+        >
+          <Icon name="plus" className="text-z-mut" size={16} />
+          <input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            disabled={disabled}
+            placeholder={hints[i % hints.length]}
+            aria-label="Ask Zynn"
+            enterKeyHint="send"
+            className="cbar-input min-w-0 flex-1 bg-transparent text-[15px] text-z-tx outline-none placeholder:text-z-mut"
+          />
+        </label>
+      </LiquidGlass>
+      <LiquidGlass
+        press={ready}
+        className={`cbar-send h-11 w-11 shrink-0${ready ? ' ready' : ''}`}
+        tint="rgba(30,30,34,.5)"
+        frost={0.6}
       >
-        <Icon name="plus" className="text-z-mut" size={16} />
-        <input
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          disabled={disabled}
-          placeholder={hints[i % hints.length]}
-          aria-label="Ask Zynn"
-          enterKeyHint="send"
-          className="cbar-input min-w-0 flex-1 bg-transparent text-[15px] text-z-tx outline-none placeholder:text-z-mut"
-        />
-      </label>
-      <button
-        type="submit"
-        className={`cbar-send rb g h-11 w-11 bg-[rgba(30,30,34,.78)]${ready ? ' ready' : ''}`}
-        aria-label="Send"
-        disabled={!ready}
-      >
-        <Icon name="send" size={16} />
-      </button>
+        <button type="submit" className="rb h-full w-full" aria-label="Send" disabled={!ready}>
+          <Icon name="send" size={16} />
+        </button>
+      </LiquidGlass>
     </form>
   )
 }
