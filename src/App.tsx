@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from '
 import { LoginSheet } from './components/LoginSheet'
 import { PageTransition } from './components/PageTransition'
 import { ToastHost } from './components/Overlays'
+import { LiquidGlassFilters } from './components/ui/liquid-glass'
 import { isReelId } from './data/reels'
 import Account from './screens/Account'
 import { AddAddress, AddressBook, ChooseAddress } from './screens/Addresses'
@@ -81,6 +82,7 @@ export default function App() {
           <AppRoutes />
         </div>
         <ToastHost />
+        <LiquidGlassFilters />
         <LoginSheet />
       </AppProvider>
     </BrowserRouter>

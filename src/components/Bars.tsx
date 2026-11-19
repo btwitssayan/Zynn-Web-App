@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { Icon } from './Icon'
-import { LiquidGlass } from './ui/liquid-glass'
+import { LiquidGlassCard } from './ui/liquid-glass'
 
 const EASE = [0.32, 0.72, 0, 1] as const
 const EASE_OUT = [0.23, 1, 0.32, 1] as const
@@ -163,7 +163,7 @@ export function ChatBar({ hints, onSubmit, disabled, gradient }: ChatBarProps) {
       style={{ opacity: disabled ? 0.5 : 1 }}
     >
       {/* Dark tint keeps placeholder and typed text legible over busy content. */}
-      <LiquidGlass className="cbar-field h-11 min-w-0 flex-1" tint="var(--z-lens)" frost={0.6}>
+      <LiquidGlassCard className="cbar-field h-11 min-w-0 flex-1" borderRadius="999px" distortion="sm" tint="var(--z-lens)">
         <label
           className={`flex h-full w-full items-center gap-3 ${
             gradient ? 'cb !bg-transparent' : 'rounded-full px-3.5'
@@ -180,16 +180,17 @@ export function ChatBar({ hints, onSubmit, disabled, gradient }: ChatBarProps) {
             className="cbar-input min-w-0 flex-1 bg-transparent text-[15px] text-z-tx outline-none placeholder:text-z-mut"
           />
         </label>
-      </LiquidGlass>
+      </LiquidGlassCard>
       <motion.div
         animate={ready ? { y: -2, scale: 1 } : { y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15 }}
       >
-        <LiquidGlass
+        <LiquidGlassCard
           press={ready}
           className={`cbar-send h-11 w-11 shrink-0${ready ? ' ready' : ''}`}
           tint="var(--z-lens)"
-          frost={0.6}
+          borderRadius="999px"
+          distortion="sm"
         >
           <motion.button
             type="submit"
@@ -207,7 +208,7 @@ export function ChatBar({ hints, onSubmit, disabled, gradient }: ChatBarProps) {
               <Icon name="send" size={16} />
             </motion.div>
           </motion.button>
-        </LiquidGlass>
+        </LiquidGlassCard>
       </motion.div>
     </form>
   )

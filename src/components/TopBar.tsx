@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router'
 import { Heart, Menu } from 'lucide-react'
 import { Icon } from './Icon'
-import { LiquidGlass } from './ui/liquid-glass'
+import { LiquidGlassCard } from './ui/liquid-glass'
 
 /** Wordmark image. `size` keeps its old meaning (type size in px); the image
  *  height includes the descender of the "y". */
@@ -21,27 +21,27 @@ export function TopBar({ inner, onMenu }: { inner?: boolean; onMenu?: () => void
     <header className="relative flex h-[72px] items-center gap-2.5 px-5 py-3.5">
       {inner ? (
         <>
-          <LiquidGlass press className="h-11 w-11 shrink-0" tint={0.1} frost={0.5}>
+          <LiquidGlassCard press className="h-11 w-11 shrink-0" borderRadius="999px" distortion="sm" tint="rgb(255 255 255 / 0.1)">
             <button className="rb h-full w-full" aria-label="Back" onClick={back}>
               <Icon name="back" />
             </button>
-          </LiquidGlass>
+          </LiquidGlassCard>
           <Link to="/" aria-label="Zynn home" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <Logo />
           </Link>
         </>
       ) : (
         <>
-          <LiquidGlass press className="h-11 w-11 shrink-0" tint={0.1} frost={0.5}>
+          <LiquidGlassCard press className="h-11 w-11 shrink-0" borderRadius="999px" distortion="sm" tint="rgb(255 255 255 / 0.1)">
             <button className="rb h-full w-full" aria-label="Menu" onClick={onMenu}>
               <Menu className="h-6 w-6" strokeWidth={2} aria-hidden="true" />
             </button>
-          </LiquidGlass>
-          <LiquidGlass press className="h-11 w-11 shrink-0" tint={0.1} frost={0.5}>
+          </LiquidGlassCard>
+          <LiquidGlassCard press className="h-11 w-11 shrink-0" borderRadius="999px" distortion="sm" tint="rgb(255 255 255 / 0.1)">
             <Link className="rb h-full w-full" aria-label="Favourites" to="/favourites">
               <Heart className="h-6 w-6" strokeWidth={2} aria-hidden="true" />
             </Link>
-          </LiquidGlass>
+          </LiquidGlassCard>
           <div className="flex-1" />
           <Link to="/" aria-label="Zynn home">
             <Logo />

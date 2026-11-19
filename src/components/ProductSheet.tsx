@@ -4,7 +4,7 @@ import { PRODUCTS } from '../data/products'
 import { inr2 } from '../lib/format'
 import { useApp } from '../store/AppStore'
 import { Icon } from './Icon'
-import { LiquidGlass } from './ui/liquid-glass'
+import { LiquidGlassCard } from './ui/liquid-glass'
 import { BottomSheet } from './Overlays'
 import { CustomerReviews, ProductDescription, ZynnSays } from './ProductDetails'
 import { StoreOptionRow } from './StoreOptionRow'
@@ -57,11 +57,11 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
           )}
           <div className="absolute top-2 left-1/2 h-[5px] w-10 -translate-x-1/2 rounded bg-[#D0D0D5]" />
           {/* Floats over the product photo, where refraction reads best. */}
-          <LiquidGlass press className="!absolute top-3.5 right-3.5 h-11 w-11" tint="rgba(60,60,67,.18)" frost={0.4}>
+          <LiquidGlassCard press className="!absolute top-3.5 right-3.5 h-11 w-11" borderRadius="999px" distortion="sm" tint="rgba(60,60,67,.18)">
             <button className="rb h-full w-full text-white" aria-label="Close" onClick={onClose}>
               <Icon name="close" size={26} strokeWidth={1.8} />
             </button>
-          </LiquidGlass>
+          </LiquidGlassCard>
         </div>
 
         <div className="px-5 pt-12 pb-14">
@@ -159,7 +159,7 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
         </div>
 
         <div className="sticky bottom-0 flex justify-end px-5 pb-6">
-          <LiquidGlass press className="h-12" tint="var(--z-lens)" frost={0.6}>
+          <LiquidGlassCard press className="h-12" borderRadius="999px" distortion="sm" tint="var(--z-lens)">
             <Link
               to={`/chat?p=${id}`}
               onClick={onClose}
@@ -168,7 +168,7 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
               <Icon name="arrowRight" />
               Follow up
             </Link>
-          </LiquidGlass>
+          </LiquidGlassCard>
         </div>
       </div>
     </BottomSheet>

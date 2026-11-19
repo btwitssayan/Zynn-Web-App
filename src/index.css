@@ -229,36 +229,69 @@
   }
 
   /* ---------- Glass + primitives ---------- */
+  /* Liquid glass (uilayouts) as a class, for surfaces that aren't React
+     <LiquidGlassCard>s. Same three layers as components/ui/liquid-glass.tsx:
+       ::before  bend — backdrop blur warped by #glass-blur-md (LiquidGlassFilters)
+       ::after   edge — inner rim highlights + a faint tint
+       box-shadow face — the "sm" glow
+     Layers sit behind the content in an isolated stacking context. The root
+     must not carry backdrop-filter/filter/opacity itself, or the bend layer
+     loses its backdrop. */
   .g {
-    background: rgb(var(--ink) / 0.06);
-    border: 1px solid rgb(var(--ink) / 0.14);
+    position: relative;
+    isolation: isolate;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
-      0 12px 32px var(--z-drop);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+      0 4px 4px rgba(0, 0, 0, 0.15),
+      0 0 12px rgba(0, 0, 0, 0.08),
+      0 0 24px rgba(255, 255, 255, 0.1);
   }
-  /* Liquid glass (components/ui/liquid-glass.tsx): reserved for the floating
-     control layer. A bright top edge and hairline catch light on the rim;
-     the outer shadow lifts the lens off content. */
-  .lg {
+  .g::before,
+  .g::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .g::before {
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+    filter: url(#glass-blur-md);
+  }
+  .g::after {
+    background: rgb(var(--ink) / 0.06);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.24),
-      inset 0 0 0 1px rgb(var(--ink) / 0.12),
-      0 12px 32px var(--z-drop);
-    transition:
-      transform 160ms var(--ease-out),
-      box-shadow 180ms var(--ease-out);
+      inset 3px 3px 3px 0 rgba(255, 255, 255, 0.45),
+      inset -3px -3px 3px 0 rgba(255, 255, 255, 0.45);
+  }
+  /* Small lenses (chips, round buttons, tabs): a 80px warp would pull empty
+     pixels in from outside the element, so bend them gently. */
+  .g.ec::before,
+  .g.rb::before,
+  .g.rounded-full::before {
+    filter: url(#glass-blur-sm);
+  }
+  /* Chips extend their hit area 2px up and down via ::after; keep that and
+     draw the rim inside the real edge with a transparent border. */
+  .g.ec::after {
+    border-block: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  /* <LiquidGlassCard> (components/ui/liquid-glass.tsx) */
+  .liquid-glass {
+    transition: transform 160ms var(--ease-out);
   }
   /* Press feedback lives on the lens, on pointer-down. */
   .lg-press:active {
     transform: scale(0.92);
   }
-  .lg .rb:active:not(:disabled) {
+  .liquid-glass .rb:active:not(:disabled) {
     transform: none;
   }
-  /* The composer's gradient ring draws inside the lens edge (lens clips). */
-  .lg > .cb::before {
+  /* The composer's gradient ring draws inside the lens edge. */
+  .liquid-glass > .cb::before {
     inset: 0;
   }
   .rb {
@@ -793,7 +826,6 @@
     transform: translateX(-50%);
     border-radius: 28px;
     padding: 32px 24px;
-    background: var(--z-glass-strong);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -818,7 +850,6 @@
     border-radius: 999px;
     padding: 0 18px 0 10px;
     gap: 10px;
-    background: var(--z-glass-strong);
     white-space: nowrap;
     font: 600 14px var(--font-sans);
     color: var(--z-tx);
@@ -1942,17 +1973,14 @@
 
   /* Chat composer — field + send button */
   .cbar-field {
-    transition:
-      border-color 180ms var(--ease-out),
-      box-shadow 180ms var(--ease-out);
+    border-color: rgba(255, 255, 255, 0.12);
+    transition: border-color 180ms var(--ease-out);
+  }
+  .cbar-field > .cb::before {
+    display: none;
   }
   .cbar-field:focus-within {
-    border-color: rgba(242, 163, 94, 0.55);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.24),
-      inset 0 0 0 1px rgba(242, 163, 94, 0.55),
-      0 12px 32px var(--z-drop),
-      0 0 0 3px rgba(242, 163, 94, 0.15);
+    border-color: rgba(255, 255, 255, 0.22);
   }
   .cbar-input {
     caret-color: var(--z-acc-tx);
@@ -1969,6 +1997,14 @@
       border-color 220ms var(--ease-out),
       box-shadow 220ms var(--ease-out),
       transform 140ms var(--ease-out);
+  }
+  .cbar-send > .lgc-bend,
+  .cbar-send > .lgc-face {
+    transition: opacity 220ms var(--ease-out);
+  }
+  .cbar-send.ready > .lgc-bend,
+  .cbar-send.ready > .lgc-face {
+    opacity: 0;
   }
   .cbar-send .ic {
     color: var(--z-mut);

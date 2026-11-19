@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { Drawer } from 'vaul'
 import { useApp } from '../store/AppStore'
 import { Icon } from './Icon'
-import { LiquidGlass } from './ui/liquid-glass'
+import { LiquidGlassCard } from './ui/liquid-glass'
 
 export function Portal({ children }: { children: ReactNode }) {
   return createPortal(children, document.body)
@@ -60,11 +60,11 @@ export function Busy({ title, sub }: { title: string; sub: string }) {
   return (
     <Portal>
       <div className="dim" />
-      <LiquidGlass className="busy !fixed" radius={28} tint="var(--z-lens)" frost={1} role="status" aria-live="polite">
+      <LiquidGlassCard className="busy !fixed" borderRadius="28px" distortion="md" tint="var(--z-lens)" role="status" aria-live="polite">
         <div className="spin" />
         <p className="h3 mt-5">{title}</p>
         <p className="s mt-1.5">{sub}</p>
-      </LiquidGlass>
+      </LiquidGlassCard>
     </Portal>
   )
 }
@@ -93,18 +93,18 @@ export function ToastHost() {
   return (
     <div className="toast-wrap" aria-live="polite">
       {offline && (
-        <LiquidGlass className="toast pl-[18px]" tint="var(--z-lens)" frost={0.8}>
+        <LiquidGlassCard className="toast pl-[18px]" borderRadius="999px" distortion="sm" tint="var(--z-lens)">
           <Icon name="wifiOff" className="text-z-err" />
           No internet connection.
-        </LiquidGlass>
+        </LiquidGlassCard>
       )}
       {toastMsg && (
-        <LiquidGlass key={toastMsg.id} className="toast" tint="var(--z-lens)" frost={0.8}>
+        <LiquidGlassCard key={toastMsg.id} className="toast" borderRadius="999px" distortion="sm" tint="var(--z-lens)">
           <span className="toast-tick">
             <Icon name="check" size={15} strokeWidth={2.4} />
           </span>
           {toastMsg.text}
-        </LiquidGlass>
+        </LiquidGlassCard>
       )}
     </div>
   )

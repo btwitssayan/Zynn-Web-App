@@ -1,410 +1,198 @@
-"use client";
+import { cn } from '@/lib/utils'
+import { motion, type HTMLMotionProps } from 'motion/react'
+import type { CSSProperties, ReactNode } from 'react'
+import { useState } from 'react'
 
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type HTMLAttributes,
-} from "react";
-import { cn } from "@/lib/utils";
-
-export type LiquidGlassProps = HTMLAttributes<HTMLDivElement> & {
-  contentClassName?: string;
-  /** Corner radius in px. Default 999 (pill). */
-  radius?: number;
-  /** Rim band that bends light, in px. */
-  bevelDepth?: number;
-  /** Displacement strength in px. */
-  scale?: number;
-  /** Chromatic aberration spread in px. */
-  aberration?: number;
-  /** Extra blur after refraction, in px. */
-  frost?: number;
-  /** Body tint: a number is a white tint 0–1; a string is any CSS colour. */
-  tint?: number | string;
-  /** Scale the whole lens down while pressed (for buttons). */
-  press?: boolean;
-};
-
-/**
- * Liquid glass surface. A Snell's-law displacement map bends whatever sits
- * behind the element through an SVG filter used as `backdrop-filter`.
- * Chromium refracts; Safari, Firefox and reduced-transparency fall back to
- * frosted glass.
+/*
+ * Liquid glass from uilayouts (`npx uilayouts@latest add liquid-glass`),
+ * adapted for this app:
+ *  - one shared SVG filter (<LiquidGlassFilters/>, mounted in App) instead of
+ *    a duplicate `#glass-blur` per instance;
+ *  - the bend / face / edge layers sit *behind* the content (isolated stacking
+ *    context, z-index -1, no pointer events) so buttons inside stay tappable
+ *    and layout is untouched;
+ *  - draggable is opt-in, because drag captures touch and stops page scroll;
+ *  - `distortion` scales the displacement to the lens size (the original 200px
+ *    displacement pulls empty pixels into a 44px button);
+ *  - `tint` fills the face layer for legibility over busy content.
+ * The same three layers drive the `.g` CSS class in index.css.
  */
-export function LiquidGlass({
+
+type Intensity = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+export type GlassDistortion = 'none' | 'sm' | 'md' | 'lg'
+
+export type LiquidGlassCardProps = Omit<HTMLMotionProps<'div'>, 'children'> & {
+  children?: ReactNode
+  draggable?: boolean
+  expandable?: boolean
+  width?: string
+  height?: string
+  expandedWidth?: string
+  expandedHeight?: string
+  blurIntensity?: 'sm' | 'md' | 'lg' | 'xl'
+  shadowIntensity?: Intensity
+  glowIntensity?: Intensity
+  borderRadius?: string
+  distortion?: GlassDistortion
+  /** Any CSS colour painted over the refracted backdrop. */
+  tint?: string
+  /** Scale the lens down while pressed (for buttons). */
+  press?: boolean
+}
+
+const blurClasses = {
+  sm: 'backdrop-blur-xs',
+  md: 'backdrop-blur-md',
+  lg: 'backdrop-blur-lg',
+  xl: 'backdrop-blur-xl',
+}
+
+const shadowStyles: Record<Intensity, string> = {
+  none: 'inset 0 0 0 0 rgba(255, 255, 255, 0)',
+  xs: 'inset 1px 1px 1px 0 rgba(255, 255, 255, 0.3), inset -1px -1px 1px 0 rgba(255, 255, 255, 0.3)',
+  sm: 'inset 2px 2px 2px 0 rgba(255, 255, 255, 0.35), inset -2px -2px 2px 0 rgba(255, 255, 255, 0.35)',
+  md: 'inset 3px 3px 3px 0 rgba(255, 255, 255, 0.45), inset -3px -3px 3px 0 rgba(255, 255, 255, 0.45)',
+  lg: 'inset 4px 4px 4px 0 rgba(255, 255, 255, 0.5), inset -4px -4px 4px 0 rgba(255, 255, 255, 0.5)',
+  xl: 'inset 6px 6px 6px 0 rgba(255, 255, 255, 0.55), inset -6px -6px 6px 0 rgba(255, 255, 255, 0.55)',
+  '2xl': 'inset 8px 8px 8px 0 rgba(255, 255, 255, 0.6), inset -8px -8px 8px 0 rgba(255, 255, 255, 0.6)',
+}
+
+const glowStyles: Record<Intensity, string> = {
+  none: '0 4px 4px rgba(0, 0, 0, 0.05), 0 0 12px rgba(0, 0, 0, 0.05)',
+  xs: '0 4px 4px rgba(0, 0, 0, 0.15), 0 0 12px rgba(0, 0, 0, 0.08), 0 0 16px rgba(255, 255, 255, 0.05)',
+  sm: '0 4px 4px rgba(0, 0, 0, 0.15), 0 0 12px rgba(0, 0, 0, 0.08), 0 0 24px rgba(255, 255, 255, 0.1)',
+  md: '0 4px 4px rgba(0, 0, 0, 0.15), 0 0 12px rgba(0, 0, 0, 0.08), 0 0 32px rgba(255, 255, 255, 0.15)',
+  lg: '0 4px 4px rgba(0, 0, 0, 0.15), 0 0 12px rgba(0, 0, 0, 0.08), 0 0 40px rgba(255, 255, 255, 0.2)',
+  xl: '0 4px 4px rgba(0, 0, 0, 0.15), 0 0 12px rgba(0, 0, 0, 0.08), 0 0 48px rgba(255, 255, 255, 0.25)',
+  '2xl': '0 4px 4px rgba(0, 0, 0, 0.15), 0 0 12px rgba(0, 0, 0, 0.08), 0 0 60px rgba(255, 255, 255, 0.3)',
+}
+
+/** Displacement in px per level; ids are referenced by `.g` in index.css too. */
+const DISTORTION_SCALE: Record<Exclude<GlassDistortion, 'none'>, number> = {
+  sm: 24,
+  md: 80,
+  lg: 200,
+}
+
+const filterUrl = (d: GlassDistortion) => (d === 'none' ? undefined : `url(#glass-blur-${d})`)
+
+/** The shared turbulence filters. Mount once near the app root. */
+export function LiquidGlassFilters() {
+  return (
+    <svg aria-hidden className="pointer-events-none absolute size-0 overflow-hidden">
+      <defs>
+        {(Object.keys(DISTORTION_SCALE) as (keyof typeof DISTORTION_SCALE)[]).map((d) => (
+          <filter key={d} id={`glass-blur-${d}`} x="0" y="0" width="100%" height="100%" filterUnits="objectBoundingBox">
+            <feTurbulence type="fractalNoise" baseFrequency="0.003 0.007" numOctaves="1" result="turbulence" />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="turbulence"
+              scale={DISTORTION_SCALE[d]}
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        ))}
+      </defs>
+    </svg>
+  )
+}
+
+const ease = [0.5, 1.5, 0.5, 1] as const
+
+export function LiquidGlassCard({
   children,
   className,
-  contentClassName,
-  radius = 999,
-  bevelDepth = 14,
-  scale = 48,
-  aberration = 4,
-  frost = 0.4,
-  tint = 0.12,
+  draggable = false,
+  expandable = false,
+  width,
+  height,
+  expandedWidth,
+  expandedHeight,
+  blurIntensity = 'xl',
+  borderRadius = '32px',
+  glowIntensity = 'sm',
+  shadowIntensity = 'md',
+  distortion = 'lg',
+  tint,
   press = false,
   style,
-  ...rest
-}: LiquidGlassProps) {
-  const reactId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
-  const rootRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ w: 0, h: 0 });
-  const [filter, setFilter] = useState<{ id: string; svg: string } | null>(
-    null,
-  );
-  const [mode, setMode] = useState<"pending" | "simple" | "opaque">("pending");
+  onClick,
+  ...props
+}: LiquidGlassCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const interactive = draggable || expandable
 
-  useEffect(() => {
-    if (prefersReducedTransparency()) setMode("opaque");
-    else if (isSafariLike() || !supportsUrlBackdropFilter()) setMode("simple");
-  }, []);
+  const motionProps: HTMLMotionProps<'div'> = interactive
+    ? {
+        variants: expandable
+          ? {
+              collapsed: { width: width || 'auto', height: height || 'auto', transition: { duration: 0.4, ease } },
+              expanded: {
+                width: expandedWidth || 'auto',
+                height: expandedHeight || 'auto',
+                transition: { duration: 0.4, ease },
+              },
+            }
+          : undefined,
+        animate: expandable ? (isExpanded ? 'expanded' : 'collapsed') : undefined,
+        drag: draggable,
+        dragConstraints: draggable ? { left: 0, right: 0, top: 0, bottom: 0 } : undefined,
+        dragElastic: draggable ? 0.3 : undefined,
+        dragTransition: draggable ? { bounceStiffness: 300, bounceDamping: 10, power: 0.3 } : undefined,
+        whileDrag: draggable ? { scale: 1.02 } : undefined,
+        whileHover: { scale: 1.01 },
+        whileTap: { scale: 0.98 },
+      }
+    : {}
 
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el || mode !== "pending") return;
-    const ro = new ResizeObserver(([entry]) => {
-      if (!entry) return;
-      // Border box, so the map matches the backdrop-filter layer.
-      const box = entry.borderBoxSize?.[0];
-      const width = box?.inlineSize ?? entry.contentRect.width;
-      const height = box?.blockSize ?? entry.contentRect.height;
-      setSize({
-        w: Math.max(1, Math.round(width)),
-        h: Math.max(1, Math.round(height)),
-      });
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [mode]);
-
-  useEffect(() => {
-    if (mode !== "pending" || size.w <= 1 || size.h <= 1) return;
-    let cancelled = false;
-
-    (async () => {
-      const mapUrl = await getDisplacementMap({
-        width: size.w,
-        height: size.h,
-        radius: Math.min(radius, size.w / 2, size.h / 2),
-        bevelDepth: Math.min(bevelDepth, Math.min(size.w, size.h) / 2),
-        dpr: Math.min(window.devicePixelRatio || 1, 2),
-      }).catch(() => null);
-      if (cancelled || !mapUrl) return;
-
-      // Fresh id each rebuild, because browsers cache filter output by id.
-      const id = `lg-${reactId}-${size.w}x${size.h}-${Date.now().toString(36)}`;
-      setFilter({
-        id,
-        svg: buildFilterSvg({
-          id,
-          mapUrl,
-          width: size.w,
-          height: size.h,
-          scale,
-          aberration,
-          frost,
-        }),
-      });
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [mode, size.w, size.h, radius, bevelDepth, scale, aberration, frost, reactId]);
-
-  const backdrop =
-    mode === "opaque"
-      ? "none"
-      : mode === "simple"
-        ? "blur(20px) saturate(1.6)"
-        : filter
-          ? `url(#${filter.id}) blur(0.5px) saturate(1.85) brightness(1.02)`
-          : "blur(10px) saturate(1.6) brightness(1.04)";
-
-  const tintColor =
-    typeof tint === "number" ? `rgb(255 255 255 / ${tint})` : tint;
+  const layer: CSSProperties = { borderRadius: 'inherit' }
 
   return (
-    <div
-      ref={rootRef}
-      data-refract={mode === "pending" && filter ? "true" : "false"}
+    <motion.div
+      data-liquid-glass=""
       className={cn(
-        "lg relative overflow-hidden",
-        // Fallbacks follow the theme tokens (dark or light surfaces).
-        mode === "simple" && "bg-[var(--z-lens)]",
-        mode === "opaque" && "bg-[var(--z-lens-solid)]",
-        press && "lg-press",
+        'liquid-glass relative isolate',
+        draggable && 'cursor-grab active:cursor-grabbing',
+        expandable && 'cursor-pointer',
+        press && 'lg-press',
         className,
       )}
       style={{
-        borderRadius: radius,
-        backgroundColor: mode === "pending" ? tintColor : undefined,
-        backdropFilter: backdrop,
-        WebkitBackdropFilter: backdrop,
+        borderRadius,
+        ...(width && !expandable && { width }),
+        ...(height && !expandable && { height }),
         ...style,
       }}
-      {...rest}
+      onClick={(e) => {
+        // Don't toggle when the tap lands on something interactive inside.
+        if (expandable && !(e.target as Element).closest('a, button, input, select, textarea')) {
+          setIsExpanded((v) => !v)
+        }
+        onClick?.(e)
+      }}
+      {...motionProps}
+      {...props}
     >
-      {filter ? (
-        <span
-          key={filter.id}
-          aria-hidden
-          className="pointer-events-none absolute size-0 overflow-hidden"
-          dangerouslySetInnerHTML={{ __html: filter.svg }}
-        />
-      ) : null}
-      {contentClassName ? (
-        <div className={contentClassName}>{children}</div>
-      ) : (
-        children
-      )}
-    </div>
-  );
-}
-
-function supportsUrlBackdropFilter() {
-  if (typeof CSS === "undefined" || !CSS.supports) return false;
-  return (
-    CSS.supports("backdrop-filter", "url(#x)") ||
-    CSS.supports("-webkit-backdrop-filter", "url(#x)")
-  );
-}
-
-function prefersReducedTransparency() {
-  if (typeof window === "undefined" || !window.matchMedia) return false;
-  return window.matchMedia("(prefers-reduced-transparency: reduce)").matches;
-}
-
-/** WebKit (incl. every iOS browser) and Gecko ignore url() backdrop filters. */
-function isSafariLike() {
-  if (typeof navigator === "undefined") return false;
-  const ua = navigator.userAgent;
-  if (/Firefox|FxiOS/.test(ua)) return true;
-  return /Safari/.test(ua) && !/Chrome|Chromium|Edg|OPR/.test(ua);
-}
-
-/** Lenses of the same size share one map; the set of sizes is small. */
-const mapCache = new Map<string, Promise<string>>();
-
-function getDisplacementMap(opts: DisplacementOptions) {
-  const key = [opts.width, opts.height, opts.radius, opts.bevelDepth, opts.dpr].join(":");
-  let entry = mapCache.get(key);
-  if (!entry) {
-    entry = generateDisplacementBlobUrl(opts).then(
-      (url) =>
-        // Decode before the filter attaches, so it never paints empty.
-        new Promise<string>((resolve) => {
-          const img = new Image();
-          img.onload = img.onerror = () => resolve(url);
-          img.src = url;
-        }),
-    );
-    entry.catch(() => mapCache.delete(key));
-    mapCache.set(key, entry);
-  }
-  return entry;
-}
-
-/* ---------------------------------------------------------------------------
- * Displacement map
- * R = horizontal bend, G = vertical bend, B = rim specular, A = shape mask.
- * Neutral grey (128) means zero displacement.
- * ------------------------------------------------------------------------- */
-
-type DisplacementOptions = {
-  width: number;
-  height: number;
-  radius: number;
-  bevelDepth: number;
-  gain?: number;
-  light?: { x: number; y: number };
-  dpr?: number;
-};
-
-/** Signed distance to a rounded box centred at the origin. <0 inside. */
-function sdRoundedBox(
-  px: number,
-  py: number,
-  halfW: number,
-  halfH: number,
-  r: number,
-) {
-  const qx = Math.abs(px) - halfW + r;
-  const qy = Math.abs(py) - halfH + r;
-  const outside = Math.hypot(Math.max(qx, 0), Math.max(qy, 0));
-  const inside = Math.min(Math.max(qx, qy), 0);
-  return inside + outside - r;
-}
-
-/** Squircle-dome slope → Snell's-law bend. `x` = 0 at the rim, 1 at centre. */
-function bendFromDepth(x: number) {
-  const u = 1 - Math.min(1, Math.max(0, x));
-  const denom = (1 - u ** 4) ** 0.75;
-  if (denom < 1e-6) return 0;
-  const thetaI = Math.atan(Math.min(u ** 3 / denom, 8));
-  const sinT = Math.sin(thetaI) / 1.5;
-  if (sinT >= 1) return Math.sin(thetaI);
-  return Math.sin(thetaI - Math.asin(sinT));
-}
-
-/** φ(d) = ∫ bend along the distance from the rim. */
-function buildPhiTable(bevelPx: number) {
-  const n = Math.max(1, Math.ceil(bevelPx));
-  const phi = new Float32Array(n + 1);
-  for (let d = 1; d <= n; d++) phi[d] = phi[d - 1] + bendFromDepth(d / n);
-  return phi;
-}
-
-function samplePhi(phi: Float32Array, depth: number) {
-  const max = phi.length - 1;
-  if (depth <= 0) return phi[0];
-  if (depth >= max) return phi[max];
-  const i = Math.floor(depth);
-  const f = depth - i;
-  return phi[i] * (1 - f) + phi[i + 1] * f;
-}
-
-function computeDisplacementData(opts: DisplacementOptions) {
-  const dpr = opts.dpr ?? 1;
-  const gain = opts.gain ?? 1.35;
-  const light = opts.light ?? { x: -0.55, y: -0.85 };
-  const lightLen = Math.hypot(light.x, light.y) || 1;
-  const lx = light.x / lightLen;
-  const ly = light.y / lightLen;
-
-  const W = Math.max(1, Math.round(opts.width * dpr));
-  const H = Math.max(1, Math.round(opts.height * dpr));
-  const halfW = W / 2;
-  const halfH = H / 2;
-  const r = Math.min(opts.radius * dpr, halfW, halfH);
-  const bevel = Math.max(1, opts.bevelDepth * dpr);
-  const phi = buildPhiTable(bevel);
-
-  // Height field over the shape, then displace along its gradient.
-  const field = new Float32Array(W * H);
-  for (let y = 0; y < H; y++) {
-    const py = y - halfH + 0.5;
-    for (let x = 0; x < W; x++) {
-      const d = sdRoundedBox(x - halfW + 0.5, py, halfW, halfH, r);
-      field[y * W + x] = d > 0 ? 0 : samplePhi(phi, Math.min(bevel, -d));
-    }
-  }
-
-  const data = new Uint8ClampedArray(W * H * 4);
-  for (let y = 0; y < H; y++) {
-    const py = y - halfH + 0.5;
-    for (let x = 0; x < W; x++) {
-      const px = x - halfW + 0.5;
-      const i = (y * W + x) << 2;
-      const d = sdRoundedBox(px, py, halfW, halfH, r);
-
-      if (d > 0) {
-        data[i] = data[i + 1] = data[i + 2] = 128;
-        data[i + 3] = 0;
-        continue;
-      }
-
-      const x0 = Math.max(0, x - 1);
-      const x1 = Math.min(W - 1, x + 1);
-      const y0 = Math.max(0, y - 1);
-      const y1 = Math.min(H - 1, y + 1);
-      const dPhiX = (field[y * W + x1] - field[y * W + x0]) / (x1 - x0 || 1);
-      const dPhiY = (field[y1 * W + x] - field[y0 * W + x]) / (y1 - y0 || 1);
-
-      // Cap so the rim compresses but never folds over itself.
-      const dx = Math.max(-1, Math.min(1, dPhiX * gain));
-      const dy = Math.max(-1, Math.min(1, dPhiY * gain));
-
-      let specular = 0;
-      if (d >= -bevel) {
-        const gx =
-          sdRoundedBox(px + 1, py, halfW, halfH, r) -
-          sdRoundedBox(px - 1, py, halfW, halfH, r);
-        const gy =
-          sdRoundedBox(px, py + 1, halfW, halfH, r) -
-          sdRoundedBox(px, py - 1, halfW, halfH, r);
-        const len = Math.hypot(gx, gy) || 1;
-        const dot = (gx / len) * lx + (gy / len) * ly;
-        const rim = 1 - Math.min(1, -d / bevel);
-        specular = (Math.max(0, dot) + Math.max(0, -dot) * 0.35) * rim;
-      }
-
-      data[i] = 128 + dx * 127;
-      data[i + 1] = 128 + dy * 127;
-      data[i + 2] = Math.round(specular * 255);
-      data[i + 3] = 255;
-    }
-  }
-
-  return { data, width: W, height: H };
-}
-
-/** PNG blob URL for feImage (WebKit rejects data: URIs inside feImage). */
-async function generateDisplacementBlobUrl(opts: DisplacementOptions) {
-  const { data, width, height } = computeDisplacementData(opts);
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("2d context unavailable");
-  ctx.putImageData(new ImageData(data, width, height), 0, 0);
-  const blob = await new Promise<Blob | null>((resolve) =>
-    canvas.toBlob(resolve, "image/png"),
-  );
-  if (!blob) throw new Error("Failed to encode displacement map");
-  return URL.createObjectURL(blob);
-}
-
-/* ---------------------------------------------------------------------------
- * SVG filter
- * ------------------------------------------------------------------------- */
-
-type FilterOptions = {
-  id: string;
-  mapUrl: string;
-  width: number;
-  height: number;
-  scale: number;
-  aberration: number;
-  frost: number;
-};
-
-function buildFilterSvg({
-  id,
-  mapUrl,
-  width,
-  height,
-  scale,
-  aberration,
-  frost,
-}: FilterOptions) {
-  const pad = Math.ceil(scale + aberration + 4);
-  const px = (pad / Math.max(1, width)) * 100;
-  const py = (pad / Math.max(1, height)) * 100;
-  const region = `x="-${px.toFixed(3)}%" y="-${py.toFixed(3)}%" width="${(100 + 2 * px).toFixed(3)}%" height="${(100 + 2 * py).toFixed(3)}%"`;
-
-  // Pixel-sized map matched to the lens; % units wash out the rim bend.
-  const map = `<feImage href="${mapUrl}" xlink:href="${mapUrl}" x="0" y="0" width="${width}" height="${height}" result="map" preserveAspectRatio="none"/>`;
-  const displace = (s: number, result: string) =>
-    `<feDisplacementMap in="SourceGraphic" in2="map" scale="${s}" xChannelSelector="R" yChannelSelector="G" result="${result}"/>`;
-
-  // One pass without aberration, so no screen-blend seams.
-  const body =
-    aberration <= 0
-      ? `${displace(scale, "rgb")}`
-      : `${displace(scale + aberration, "dispR")}
-  <feColorMatrix in="dispR" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
-  ${displace(scale, "dispG")}
-  <feColorMatrix in="dispG" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
-  ${displace(Math.max(0, scale - aberration), "dispB")}
-  <feColorMatrix in="dispB" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
-  <feBlend in="red" in2="green" mode="screen" result="rg"/>
-  <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>`;
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="0" height="0" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><filter id="${id}" color-interpolation-filters="sRGB" ${region}>
-  ${map}
-  ${body}
-  <feGaussianBlur in="rgb" stdDeviation="${frost}"/>
-</filter></svg>`;
+      {/* Bend layer: backdrop blur, warped by the turbulence filter. */}
+      <div
+        aria-hidden
+        className={cn('lgc-bend pointer-events-none absolute inset-0 -z-10', blurClasses[blurIntensity])}
+        style={{ ...layer, filter: filterUrl(distortion) }}
+      />
+      {/* Face layer: outer shadow + glow, and the optional tint. */}
+      <div
+        aria-hidden
+        className="lgc-face pointer-events-none absolute inset-0 -z-10"
+        style={{ ...layer, boxShadow: glowStyles[glowIntensity], background: tint }}
+      />
+      {/* Edge layer: inner highlights on the rim. */}
+      <div
+        aria-hidden
+        className="lgc-edge pointer-events-none absolute inset-0 -z-10"
+        style={{ ...layer, boxShadow: shadowStyles[shadowIntensity] }}
+      />
+      {children}
+    </motion.div>
+  )
 }
