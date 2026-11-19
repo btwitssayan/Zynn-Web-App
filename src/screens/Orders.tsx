@@ -139,16 +139,16 @@ export function Track() {
     <div className="scr pb-10">
       <TopBar inner />
       <div className="px-5 pt-3">
-        <div className="relative aspect-[350/220] overflow-hidden rounded-3xl border border-white/8 bg-[#17171A]">
+        <div className="relative aspect-[350/220] overflow-hidden rounded-3xl border border-ink/8 bg-z-surface-2">
           <svg viewBox="0 0 350 220" className="absolute inset-0 h-full w-full" aria-hidden="true">
-            <path d="M-10 60H360M-10 160H360M90 -10V230M250 -10V230M0 230L180 -10" stroke="#232328" strokeWidth="12" fill="none" />
+            <path d="M-10 60H360M-10 160H360M90 -10V230M250 -10V230M0 230L180 -10" style={{ stroke: 'var(--z-map-road)' }} strokeWidth="12" fill="none" />
             <path d="M60 52H250V150H292" stroke="#F2A35E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
           </svg>
-          <span className="g absolute top-[14.5%] left-[11.4%] flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(30,30,34,.9)]">
+          <span className="g absolute top-[14.5%] left-[11.4%] flex h-10 w-10 items-center justify-center rounded-full bg-[var(--z-glass-strong)]">
             <Icon name="store" size={18} />
           </span>
           <span className="pulse-dot absolute top-[41.8%] left-[68.9%] h-[18px] w-[18px] rounded-full bg-z-acc" />
-          <span className="g absolute top-[59.1%] left-[79.4%] flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(30,30,34,.9)]">
+          <span className="g absolute top-[59.1%] left-[79.4%] flex h-10 w-10 items-center justify-center rounded-full bg-[var(--z-glass-strong)]">
             <Icon name="pin" size={18} />
           </span>
         </div>

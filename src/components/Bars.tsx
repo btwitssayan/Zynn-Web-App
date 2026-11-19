@@ -163,7 +163,7 @@ export function ChatBar({ hints, onSubmit, disabled, gradient }: ChatBarProps) {
       style={{ opacity: disabled ? 0.5 : 1 }}
     >
       {/* Dark tint keeps placeholder and typed text legible over busy content. */}
-      <LiquidGlass className="cbar-field h-11 min-w-0 flex-1" tint="rgba(30,30,34,.5)" frost={0.6}>
+      <LiquidGlass className="cbar-field h-11 min-w-0 flex-1" tint="var(--z-lens)" frost={0.6}>
         <label
           className={`flex h-full w-full items-center gap-3 ${
             gradient ? 'cb !bg-transparent' : 'rounded-full px-3.5'
@@ -188,7 +188,7 @@ export function ChatBar({ hints, onSubmit, disabled, gradient }: ChatBarProps) {
         <LiquidGlass
           press={ready}
           className={`cbar-send h-11 w-11 shrink-0${ready ? ' ready' : ''}`}
-          tint="rgba(30,30,34,.5)"
+          tint="var(--z-lens)"
           frost={0.6}
         >
           <motion.button

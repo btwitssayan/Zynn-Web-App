@@ -8,12 +8,16 @@ import { LiquidGlass } from './ui/liquid-glass'
 import { BottomSheet } from './Overlays'
 import { CustomerReviews, ProductDescription, ZynnSays } from './ProductDetails'
 import { StoreOptionRow } from './StoreOptionRow'
+import { OnlineStores, type OnlineStore } from './OnlineStores'
 
 export function ProductSheet({ id, onClose }: { id: string; onClose: () => void }) {
   const app = useApp()
   const p = PRODUCTS[id]
   const offers = [...p.offers].sort((a, b) => a.price - b.price)
-  const online = [...(p.fallback ?? [])].sort((a, b) => a.price - b.price)
+  const online: OnlineStore[] = [
+    ...(p.fallback ?? []),
+    ...(p.brandSite ? [{ store: 'Brand website', price: p.brandSite }] : []),
+  ].sort((a, b) => a.price - b.price)
   const saved = app.favourites.includes(id)
   const visit = (store: string) => app.toast(`Opening ${store}…`)
   const gallery = p.images?.length ? p.images : p.image ? [p.image] : []
@@ -55,13 +59,13 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
           {/* Floats over the product photo, where refraction reads best. */}
           <LiquidGlass press className="!absolute top-3.5 right-3.5 h-11 w-11" tint="rgba(60,60,67,.18)" frost={0.4}>
             <button className="rb h-full w-full text-white" aria-label="Close" onClick={onClose}>
-              <Icon name="close" />
+              <Icon name="close" size={26} strokeWidth={1.8} />
             </button>
           </LiquidGlass>
         </div>
 
-        <div className="px-5 pt-[18px] pb-6">
-          <div className="flex items-start gap-3">
+        <div className="px-5 pt-12 pb-14">
+          <div className="pd-identity flex items-start gap-3">
             <div className="flex-1">
               <p className="s text-sm">{p.brand}</p>
               <h2 className="h2 mt-0.5 text-[21px]">{p.title}</h2>
@@ -73,11 +77,11 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
               onClick={() => app.toggleFav(id)}
               style={{ color: saved ? '#FF4D61' : undefined }}
             >
-              <Icon name="heart" fill={saved ? '#FF4D61' : 'none'} />
+              <Icon name="heart" size={26} strokeWidth={1.8} fill={saved ? '#FF4D61' : 'none'} />
             </button>
           </div>
           {p.facts.length > 0 && (
-            <div className="chips mt-3.5">
+            <div className="chips pd-facts mt-8">
               {p.facts.map((f) => (
                 <span key={f} className="chip f">
                   {f}
@@ -87,11 +91,20 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
           )}
 
           {offers.length > 0 && (
-            <div className="pr-panel mt-4">
-              <div className="pr-head">
-                <p className="pr-title">Quick commerce</p>
-                <span className="pr-sub">Delivered in minutes</span>
-              </div>
+            <section className="pr-panel pd-buy-section" aria-label="Quick commerce">
+              <header className="pr-head">
+                <span className="pr-label pr-label-fast">
+                  <Icon name="bolt" size={16} strokeWidth={2} />
+                  Delivered in minutes
+                </span>
+                <button
+                  className="pr-info"
+                  aria-label="About quick delivery"
+                  onClick={() => app.toast('Added items check out on Instamart or Zepto')}
+                >
+                  <Icon name="info" size={20} strokeWidth={2} />
+                </button>
+              </header>
               {offers.map((o, i) => {
                 const q = app.lineQty(id, o.store)
                 return (
@@ -110,41 +123,17 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
                   />
                 )
               })}
-            </div>
+            </section>
           )}
 
-          {!offers.length && <p className="s mt-4">Not available on Instamart or Zepto right now.</p>}
+          {!offers.length && <p className="pd-buy-note">Not available on Instamart or Zepto right now.</p>}
 
-          {(online.length > 0 || p.brandSite) && (
-            <div className={`pr-panel ${offers.length ? 'mt-3' : 'mt-2.5'}`}>
-              <div className="pr-head">
-                <p className="pr-title">Online stores</p>
-                <span className="pr-sub">Compare instantly</span>
-              </div>
-              {online.map((f, i) => (
-                <StoreOptionRow
-                  key={f.store}
-                  store={f.store}
-                  price={inr2(f.price)}
-                  kind="fb"
-                  logo={f.logo}
-                  lowest={online.length > 1 && i === 0}
-                  onVisit={() => visit(f.store)}
-                />
-              ))}
-              {p.brandSite && (
-                <StoreOptionRow
-                  store="Brand website"
-                  price={inr2(p.brandSite)}
-                  kind="visit"
-                  onVisit={() => visit('brand website')}
-                />
-              )}
-            </div>
-          )}
-          {!offers.length && !online.length && p.brandSite && (
-            <p className="s mt-2.5">You'll complete this purchase on their website.</p>
-          )}
+          <OnlineStores
+            stores={online}
+            className="pd-store-section"
+            onVisit={(store) => visit(store === 'Brand website' ? 'brand website' : store)}
+            onInfo={() => app.toast("You'll complete these purchases on the store's own website")}
+          />
 
           {p.zynnSays && (
             <ZynnSays
@@ -170,7 +159,7 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
         </div>
 
         <div className="sticky bottom-0 flex justify-end px-5 pb-6">
-          <LiquidGlass press className="h-12" tint="rgba(30,30,34,.55)" frost={0.6}>
+          <LiquidGlass press className="h-12" tint="var(--z-lens)" frost={0.6}>
             <Link
               to={`/chat?p=${id}`}
               onClick={onClose}

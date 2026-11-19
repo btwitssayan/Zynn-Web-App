@@ -131,9 +131,9 @@ export function LiquidGlass({
       data-refract={mode === "pending" && filter ? "true" : "false"}
       className={cn(
         "lg relative overflow-hidden",
-        // Fallbacks match the app's dark surfaces, not a light theme.
-        mode === "simple" && "bg-[rgba(30,30,34,0.62)]",
-        mode === "opaque" && "bg-[#1e1e22]",
+        // Fallbacks follow the theme tokens (dark or light surfaces).
+        mode === "simple" && "bg-[var(--z-lens)]",
+        mode === "opaque" && "bg-[var(--z-lens-solid)]",
         press && "lg-press",
         className,
       )}

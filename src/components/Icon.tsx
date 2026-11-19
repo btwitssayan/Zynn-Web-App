@@ -10,6 +10,7 @@ const PATHS = {
   bag: 'M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2',
   check: 'M5 12.5l4.5 4.5L19 7',
   info: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v5M12 8h.01',
+  bolt: 'M13 3 5.5 13.5H11L10 21l7.5-10.5H12L13 3z',
   arrowRight: 'M5 12h14M13 6l6 6-6 6',
   arrowUpRight: 'M7 17L17 7M8 7h9v9',
   drop: 'M12 3s6 6.5 6 10.5a6 6 0 0 1-12 0C6 9.5 12 3 12 3z',

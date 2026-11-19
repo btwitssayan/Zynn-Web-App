@@ -21,12 +21,12 @@ function Collage({ ids }: { ids: string[] }) {
   const imgs = ids.map((id) => PRODUCTS[id]?.image).filter((s): s is string => !!s)
   if (imgs.length === 1)
     return (
-      <span className="block h-11 w-11 flex-none overflow-hidden rounded-[10px] border border-white/10 [background:var(--z-photo)]">
+      <span className="block h-11 w-11 flex-none overflow-hidden rounded-[10px] border border-ink/10 [background:var(--z-photo)]">
         <img src={imgs[0]} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
       </span>
     )
   return (
-    <span className="grid h-11 w-11 flex-none grid-cols-2 grid-rows-2 gap-px overflow-hidden rounded-[10px] border border-white/10 bg-white/10">
+    <span className="grid h-11 w-11 flex-none grid-cols-2 grid-rows-2 gap-px overflow-hidden rounded-[10px] border border-ink/10 bg-ink/10">
       {[0, 1, 2, 3].map((i) =>
         imgs[i] ? (
           <img key={i} src={imgs[i]} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
@@ -108,7 +108,7 @@ export function Drawer({ onClose }: { onClose: () => void }) {
           </div>
         ) : (
           <div className="g mt-4 flex items-center gap-2.5 rounded-[20px] p-3">
-            <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl border border-white/15 bg-black/25">
+            <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl border border-ink/15 bg-[var(--z-well)]">
               <Icon name="user" size={18} className="text-z-tx" />
             </span>
             <span className="min-w-0 flex-1">

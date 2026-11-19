@@ -129,10 +129,10 @@ export function AddAddress() {
       <div className="px-5 pt-3">
         <h1 className="h1">New address</h1>
         <div
-          className="relative mt-[18px] h-[200px] overflow-hidden rounded-3xl border border-white/8 bg-[#17171A]"
+          className="relative mt-[18px] h-[200px] overflow-hidden rounded-3xl border border-ink/8 bg-z-surface-2"
           style={{
             backgroundImage:
-              'linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px)',
+              'linear-gradient(rgb(var(--ink) / .05) 1px,transparent 1px),linear-gradient(90deg,rgb(var(--ink) / .05) 1px,transparent 1px)',
             backgroundSize: '36px 36px',
           }}
         >
@@ -202,7 +202,7 @@ export function AddressBook() {
             <p className="cap mt-[22px] mb-2.5">{s}</p>
             <div className="g gc px-4 py-1">
               {app.addresses[s].map((a) => (
-                <div key={a.id} className="flex items-start gap-3 border-b border-white/8 py-3">
+                <div key={a.id} className="flex items-start gap-3 border-b border-ink/8 py-3">
                   <Icon name="pin" className="mt-0.5" />
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <span className="h3">{a.label}</span>

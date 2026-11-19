@@ -120,11 +120,11 @@ export function Note({
         border: `1px solid ${e ? 'rgba(229,128,122,.35)' : 'rgba(242,163,94,.3)'}`,
       }}
     >
-      <span className="mt-px flex" style={{ color: e ? '#E5807A' : '#F2A35E' }}>
+      <span className="mt-px flex" style={{ color: e ? 'var(--z-err)' : 'var(--z-acc-tx)' }}>
         <Icon name="info" />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-        <p className="text-[13px] leading-[1.45]" style={{ color: e ? '#E5807A' : '#EDEDEF' }}>
+        <p className="text-[13px] leading-[1.45]" style={{ color: e ? 'var(--z-err)' : 'var(--z-tx)' }}>
           {text}
         </p>
         {action && (
@@ -138,11 +138,11 @@ export function Note({
 }
 
 const PILL: Record<PillKind, [string, string, string]> = {
-  placed: ['#EDEDEF', 'rgba(255,255,255,.08)', 'transparent'],
-  way: ['#F2A35E', 'rgba(242,163,94,.16)', 'transparent'],
-  done: ['#8E8E93', 'rgba(255,255,255,.05)', 'transparent'],
-  cancel: ['#E5807A', 'rgba(229,128,122,.1)', 'transparent'],
-  pend: ['#F2A35E', 'transparent', '#F2A35E'],
+  placed: ['var(--z-tx)', 'rgb(var(--ink) / .08)', 'transparent'],
+  way: ['var(--z-acc-tx)', 'rgba(242,163,94,.16)', 'transparent'],
+  done: ['var(--z-mut)', 'rgb(var(--ink) / .05)', 'transparent'],
+  cancel: ['var(--z-err)', 'rgba(229,128,122,.1)', 'transparent'],
+  pend: ['var(--z-acc-tx)', 'transparent', 'var(--z-acc-tx)'],
 }
 
 export function StatusPill({ kind = 'placed', children }: { kind?: PillKind; children: ReactNode }) {
@@ -209,7 +209,7 @@ export function EmptyState({
 export function Tick({ tone = 'ok' }: { tone?: 'ok' | 'err' | 'warn' }) {
   if (tone === 'err')
     return (
-      <div className="tick" style={{ background: 'rgba(229,128,122,.12)', color: '#E5807A', boxShadow: 'none' }}>
+      <div className="tick" style={{ background: 'rgba(229,128,122,.12)', color: 'var(--z-err)', boxShadow: 'none' }}>
         <Icon name="close" />
       </div>
     )
@@ -223,7 +223,7 @@ export function Tick({ tone = 'ok' }: { tone?: 'ok' | 'err' | 'warn' }) {
 export function StoreLogo({ letter, size = 44 }: { letter: string; size?: number }) {
   return (
     <span
-      className="flex flex-none items-center justify-center rounded-full bg-white font-extrabold text-z-strip"
+      className="flex flex-none items-center justify-center rounded-full bg-white font-extrabold text-[#141416] ring-1 ring-ink/10"
       style={{ width: size, height: size, fontSize: size * 0.36 }}
     >
       {letter}

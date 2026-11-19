@@ -79,7 +79,7 @@ export default function Home({ reelId }: { reelId: ReelId }) {
     <div className="z2 pb-48">
       <TopBar onMenu={() => setMenu(true)} />
 
-      <div className="px-5">
+      <div className="px-5 pt-7">
         <p className="gr">
           hey {app.user?.name ?? 'there'} <Icon name="wave" size={15} className="inline-block align-[-2.5px]" />
         </p>

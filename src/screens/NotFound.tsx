@@ -22,7 +22,7 @@ export default function NotFound() {
           />
         </div>
         <p className="mt-3">
-          <code className="inline-block max-w-full truncate rounded-[10px] border border-white/10 bg-white/5 px-3 py-1.5 align-bottom font-mono text-[12px] leading-5 text-z-mut">
+          <code className="inline-block max-w-full truncate rounded-[10px] border border-ink/10 bg-ink/5 px-3 py-1.5 align-bottom font-mono text-[12px] leading-5 text-z-mut">
             404 · {pathname}
           </code>
         </p>

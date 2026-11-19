@@ -60,7 +60,7 @@ export function Busy({ title, sub }: { title: string; sub: string }) {
   return (
     <Portal>
       <div className="dim" />
-      <LiquidGlass className="busy !fixed" radius={28} tint="rgba(30,30,34,.62)" frost={1} role="status" aria-live="polite">
+      <LiquidGlass className="busy !fixed" radius={28} tint="var(--z-lens)" frost={1} role="status" aria-live="polite">
         <div className="spin" />
         <p className="h3 mt-5">{title}</p>
         <p className="s mt-1.5">{sub}</p>
@@ -93,13 +93,13 @@ export function ToastHost() {
   return (
     <div className="toast-wrap" aria-live="polite">
       {offline && (
-        <LiquidGlass className="toast pl-[18px]" tint="rgba(40,40,44,.55)" frost={0.8}>
+        <LiquidGlass className="toast pl-[18px]" tint="var(--z-lens)" frost={0.8}>
           <Icon name="wifiOff" className="text-z-err" />
           No internet connection.
         </LiquidGlass>
       )}
       {toastMsg && (
-        <LiquidGlass key={toastMsg.id} className="toast" tint="rgba(40,40,44,.55)" frost={0.8}>
+        <LiquidGlass key={toastMsg.id} className="toast" tint="var(--z-lens)" frost={0.8}>
           <span className="toast-tick">
             <Icon name="check" size={15} strokeWidth={2.4} />
           </span>

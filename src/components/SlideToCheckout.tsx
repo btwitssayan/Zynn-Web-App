@@ -150,8 +150,8 @@ export function SlideToCheckout({
       onKeyDown={handleKeyDown}
       className={`relative flex h-14 w-full select-none items-center overflow-hidden rounded-full transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-z-acc ${
         disabled
-          ? 'cursor-not-allowed border border-white/5 bg-[#18181b]/70 opacity-60'
-          : 'border border-white/12 bg-[rgba(24,24,28,0.85)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.35),0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-xl'
+          ? 'cursor-not-allowed border border-ink/5 bg-[var(--z-off-bg)] opacity-60'
+          : 'border border-ink/12 bg-[var(--z-glass-strong)] shadow-[inset_0_2px_4px_var(--z-drop),0_4px_20px_var(--z-drop)] backdrop-blur-xl'
       } ${className}`}
       style={{ touchAction: 'pan-y' }}
     >
@@ -177,13 +177,13 @@ export function SlideToCheckout({
       >
         <span
           className={`text-[15px] font-bold tracking-tight ${
-            disabled ? 'text-z-mut' : 'text-[#ededef]'
+            disabled ? 'text-z-mut' : 'text-z-tx'
           }`}
           style={
             !disabled && !prefersReducedMotion
               ? {
                   background:
-                    'linear-gradient(90deg, rgba(237,237,239,0.7) 0%, #ffffff 50%, rgba(237,237,239,0.7) 100%)',
+                    'var(--z-shimmer)',
                   backgroundSize: '200% 100%',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
@@ -224,7 +224,7 @@ export function SlideToCheckout({
         whileTap={disabled || isConfirmed ? undefined : { scale: 0.96 }}
         className={`absolute top-1 left-1 z-10 flex h-12 w-12 items-center justify-center rounded-full transition-colors select-none ${
           disabled
-            ? 'cursor-not-allowed bg-[#2a2a2e] text-[#6e6e73]'
+            ? 'cursor-not-allowed bg-[var(--z-off-bg)] text-[var(--z-off-tx)]'
             : isConfirmed
               ? 'bg-white text-[#0b0b0d] shadow-[0_0_18px_rgba(242,163,94,0.6)]'
               : 'cursor-grab bg-white text-[#0b0b0d] shadow-[0_3px_12px_rgba(0,0,0,0.4),0_1px_3px_rgba(0,0,0,0.2),inset_0_1px_0_#ffffff] active:cursor-grabbing'
@@ -250,7 +250,7 @@ export function SlideToCheckout({
             name="arrowRight"
             size={19}
             strokeWidth={2.4}
-            className={disabled ? 'text-[#6e6e73]' : 'text-[#0b0b0d]'}
+            className={disabled ? 'text-[var(--z-off-tx)]' : 'text-[#0b0b0d]'}
           />
         )}
       </motion.div>

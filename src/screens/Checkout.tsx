@@ -89,7 +89,7 @@ export function ReviewOrder() {
         <h1 className="h1">Review order</h1>
         <div className="mt-3 flex gap-1.5">
           {app.checkout.map((s, k) => (
-            <div key={s} className="h-1 flex-1 rounded-sm" style={{ background: k <= idx ? '#F2A35E' : 'rgba(255,255,255,.12)' }} />
+            <div key={s} className="h-1 flex-1 rounded-sm" style={{ background: k <= idx ? '#F2A35E' : 'rgb(var(--ink) / .12)' }} />
           ))}
         </div>
         <p className="s mt-2">
@@ -141,7 +141,7 @@ export function ReviewOrder() {
                 className="flex w-[76px] flex-col items-center gap-2 text-xs font-medium text-z-tx"
               >
                 <span
-                  className={`flex h-14 w-14 items-center justify-center rounded-full bg-white text-sm font-extrabold text-z-strip ${method === u.id ? 'z-sel' : ''}`}
+                  className={`flex h-14 w-14 items-center justify-center rounded-full bg-white text-sm font-extrabold text-[#141416] ring-1 ring-ink/10 ${method === u.id ? 'z-sel' : ''}`}
                 >
                   {u.logo}
                 </span>
@@ -157,7 +157,7 @@ export function ReviewOrder() {
               role="radio"
               aria-checked={method === m.id}
               onClick={() => setMethod(m.id)}
-              className={`flex min-h-14 w-full items-center gap-3 text-left text-z-tx ${k ? 'border-t border-white/8' : ''}`}
+              className={`flex min-h-14 w-full items-center gap-3 text-left text-z-tx ${k ? 'border-t border-ink/8' : ''}`}
             >
               <Icon name={m.icon} />
               <span className="flex-1 text-[15px]">{m.id}</span>

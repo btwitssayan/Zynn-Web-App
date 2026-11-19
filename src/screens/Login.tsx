@@ -107,11 +107,11 @@ export function LoginOtp() {
                 if (error) setError(false)
               }}
               autoFocus
-              accentColor="#f5f5f5"
-              inkColor="#f5f5f5"
-              slotColor="#27272a"
-              digitColor="#18181b"
-              dangerColor="#e5807a"
+              accentColor="var(--z-inv)"
+              inkColor="var(--z-tx)"
+              slotColor="var(--z-off-bg)"
+              digitColor="var(--z-on-inv)"
+              dangerColor="var(--z-err)"
               slotSize={44}
               gap={8}
               radius={12}

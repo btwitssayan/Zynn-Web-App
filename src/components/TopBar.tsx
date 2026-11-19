@@ -1,10 +1,11 @@
 import { Link, useNavigate } from 'react-router'
+import { Heart, Menu } from 'lucide-react'
 import { Icon } from './Icon'
 import { LiquidGlass } from './ui/liquid-glass'
 
 /** Wordmark image. `size` keeps its old meaning (type size in px); the image
  *  height includes the descender of the "y". */
-export function Logo({ size = 26 }: { size?: number }) {
+export function Logo({ size = 22 }: { size?: number }) {
   const h = Math.round(size * 1.2)
   return <img src="/logo.png" alt="Zynn.ai" className="logo" height={h} width={Math.round((h * 560) / 180)} draggable={false} />
 }
@@ -33,12 +34,12 @@ export function TopBar({ inner, onMenu }: { inner?: boolean; onMenu?: () => void
         <>
           <LiquidGlass press className="h-11 w-11 shrink-0" tint={0.1} frost={0.5}>
             <button className="rb h-full w-full" aria-label="Menu" onClick={onMenu}>
-              <Icon name="menu" />
+              <Menu className="h-6 w-6" strokeWidth={2} aria-hidden="true" />
             </button>
           </LiquidGlass>
           <LiquidGlass press className="h-11 w-11 shrink-0" tint={0.1} frost={0.5}>
             <Link className="rb h-full w-full" aria-label="Favourites" to="/favourites">
-              <Icon name="heart" />
+              <Heart className="h-6 w-6" strokeWidth={2} aria-hidden="true" />
             </Link>
           </LiquidGlass>
           <div className="flex-1" />

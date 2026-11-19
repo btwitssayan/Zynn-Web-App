@@ -25,9 +25,9 @@ export function PayUpi() {
   return (
     <div className="scr">
       <TopBar inner />
-      <div className="g mx-5 mt-[110px] flex flex-col items-center rounded-[28px] bg-[rgba(30,30,34,.7)] px-6 py-9 text-center">
+      <div className="g mx-5 mt-[110px] flex flex-col items-center rounded-[28px] bg-[var(--z-glass)] px-6 py-9 text-center">
         <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true" className="ring-spin">
-          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="6" />
+          <circle cx="40" cy="40" r="34" fill="none" style={{ stroke: 'rgb(var(--ink) / .1)' }} strokeWidth="6" />
           <circle
             cx="40"
             cy="40"
