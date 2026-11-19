@@ -98,7 +98,7 @@ function Layer({ children, first }: { children: ReactNode; first: boolean }) {
         right: 0,
         top: exiting ? -y : undefined,
         zIndex: onTop ? 2 : 1,
-        background: '#0b0b0d',
+        background: '#000',
         height: exiting ? y + window.innerHeight : settled ? undefined : '100dvh',
         overflow: settled && !exiting ? 'auto' : 'hidden',
         pointerEvents: exiting ? 'none' : undefined,

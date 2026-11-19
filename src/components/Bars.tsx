@@ -181,16 +181,34 @@ export function ChatBar({ hints, onSubmit, disabled, gradient }: ChatBarProps) {
           />
         </label>
       </LiquidGlass>
-      <LiquidGlass
-        press={ready}
-        className={`cbar-send h-11 w-11 shrink-0${ready ? ' ready' : ''}`}
-        tint="rgba(30,30,34,.5)"
-        frost={0.6}
+      <motion.div
+        animate={ready ? { y: -2, scale: 1 } : { y: 0, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
       >
-        <button type="submit" className="rb h-full w-full" aria-label="Send" disabled={!ready}>
-          <Icon name="send" size={16} />
-        </button>
-      </LiquidGlass>
+        <LiquidGlass
+          press={ready}
+          className={`cbar-send h-11 w-11 shrink-0${ready ? ' ready' : ''}`}
+          tint="rgba(30,30,34,.5)"
+          frost={0.6}
+        >
+          <motion.button
+            type="submit"
+            className="rb h-full w-full"
+            aria-label="Send"
+            disabled={!ready}
+            whileHover={ready ? { scale: 1.08 } : {}}
+            whileTap={ready ? { scale: 0.92 } : {}}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          >
+            <motion.div
+              animate={ready ? { rotate: 12 } : { rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            >
+              <Icon name="send" size={16} />
+            </motion.div>
+          </motion.button>
+        </LiquidGlass>
+      </motion.div>
     </form>
   )
 }

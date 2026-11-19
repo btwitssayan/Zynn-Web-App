@@ -1,3 +1,4 @@
+import { CONTENT } from './productContent'
 import type { Offer, Product, StoreName } from './types'
 
 const im = (price: number, extra: Partial<Offer> = {}): Offer => ({ store: 'Instamart', price, eta: '10 mins', ...extra })
@@ -148,8 +149,34 @@ const PHOTOS: Record<string, string> = {
   'lakme-eyeconic-kajal': 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Glass_Kohl_rods%2C_Dynasty_18_%281550-1292_BCE%29_Fitzwilliam_Museum%2C_Cambridge.jpg/960px-Glass_Kohl_rods%2C_Dynasty_18_%281550-1292_BCE%29_Fitzwilliam_Museum%2C_Cambridge.jpg',
 }
 
+const GALLERIES: Record<string, string[]> = {
+  'maybelline-ultimatte': ['/products/lipstick-product.jpg', '/products/beauty-makeup.jpg', '/products/makeup-products.jpg'],
+  'lakme-9to5-lip': ['/products/makeup-products.jpg', '/products/beauty-makeup.jpg', '/products/lipstick-product.jpg'],
+  'sugar-matte-crayon': ['/products/beauty-makeup.jpg', '/products/lipstick-product.jpg', '/products/makeup-products.jpg'],
+  'lip-oil': ['/products/lip-balm.jpg', '/products/beauty-makeup.jpg'],
+  'ladi-pav-8': ['/products/pav-bread.jpg', '/products/pav-bhaji.jpg'],
+  'ladi-pav-12': ['/products/pav-bread.jpg', '/products/pav-bhaji.jpg'],
+  potato: ['/products/potato.jpg'],
+  tomato: ['/products/tomatoes.jpg'],
+  capsicum: ['/products/bell-pepper.jpg'],
+  'amul-butter-100': ['/products/butter-block.jpg'],
+  'mother-dairy-butter': ['/products/butter-block.jpg'],
+  'amul-butter-500': ['/products/butter-block.jpg'],
+  'everest-kashmiri': ['/products/chilli-kashmiri.jpg'],
+  'mdh-kashmiri': ['/products/chilli-kashmiri.jpg'],
+  'catch-kashmiri': ['/products/chilli-kashmiri.jpg'],
+  'mdh-pav-bhaji': ['/products/pav-bhaji.jpg'],
+  'everest-pav-bhaji': ['/products/pav-bhaji.jpg'],
+  'catch-pav-bhaji': ['/products/pav-bhaji.jpg'],
+}
+
 export const PRODUCTS: Record<string, Product> = Object.fromEntries(
-  LIST.map((p) => [p.id, { ...p, image: PHOTOS[p.id] ?? p.image }]),
+  LIST.map((p) => {
+    const { online, ...extra } = CONTENT[p.id] ?? {}
+    const image = PHOTOS[p.id] ?? p.image
+    const images = GALLERIES[p.id] ?? (image ? [image] : undefined)
+    return [p.id, { ...p, ...extra, fallback: p.fallback ?? online, image, images }]
+  }),
 )
 
 export const bestOffer = (p: Product) =>

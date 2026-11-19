@@ -144,11 +144,18 @@ export default function DevGallery() {
         </Section>
 
         <Section title="StoreOptionRow · Add / Added + Lowest / Visit / Fallback">
-          <div className="dk px-4 py-1">
+          <div className="pr-panel">
+            <div className="pr-head">
+              <p className="pr-title">Best prices</p>
+              <span className="pr-sub">Compare instantly</span>
+            </div>
+            <StoreOptionRow store="Nykaa" price="₹259.00" kind="fb" lowest />
+            <StoreOptionRow store="Myntra" price="₹299.00" kind="fb" />
+            <StoreOptionRow store="Tirabeauty" price="₹748.00" kind="fb" />
+            <StoreOptionRow store="Amazon" price="₹748.00" kind="fb" />
+            <StoreOptionRow store="Zepto" price="₹579.00" eta="12 mins" kind="added" qty={2} />
             <StoreOptionRow store="Instamart" price="₹599.00" eta="10 mins" kind="add" />
-            <StoreOptionRow store="Zepto" price="₹579.00" kind="added" lowest line />
-            <StoreOptionRow store="Brand website" price="₹599.00" kind="visit" line />
-            <StoreOptionRow store="Myntra" price="₹245.00" kind="fb" logo="M" line />
+            <StoreOptionRow store="Brand website" price="₹599.00" kind="visit" />
           </div>
         </Section>
 

@@ -83,11 +83,14 @@ export default function Home({ reelId }: { reelId: ReelId }) {
         <p className="gr">
           hey {app.user?.name ?? 'there'} <Icon name="wave" size={15} className="inline-block align-[-2.5px]" />
         </p>
-        <h1 className="hd">
-          {head.ha}
-          <i>{head.hi}</i>
-          {head.hb}
-        </h1>
+        <div className="flex items-start justify-between gap-2">
+          <h1 className="hd">
+            {head.ha}
+            <i className={head.hi === 'found' ? 'found' : undefined}>{head.hi}</i>
+            {head.hb}
+          </h1>
+          <Icon name="sparkle" size={22} className="mt-1 shrink-0 text-z-mut" />
+        </div>
         {head.sub && <p className="sb">{head.sub}</p>}
         {!loading && isRecipe && (
           <div className="mt-2.5 flex items-center gap-3">

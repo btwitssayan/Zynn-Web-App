@@ -24,12 +24,30 @@ export interface Product {
   size: string
   brand: string
   facts: string[]
+  /** Quick-commerce listings (Instamart, Zepto) that can be added to the cart. */
   offers: Offer[]
+  /** E-commerce listings (Nykaa, Myntra, Amazon…) opened on the store's site. */
   fallback?: Fallback[]
   brandSite?: number
   image?: string
+  images?: string[]
   oos?: boolean
   noReviews?: boolean
+  /** Zynn's one-paragraph take. Wrap phrases in **double asterisks** to bold them. */
+  zynnSays?: string
+  /** How well the product fits the request, 0–100. */
+  relevance?: number
+  reviews?: Review[]
+  description?: string
+}
+
+export interface Review {
+  author: string
+  date: string
+  rating: number
+  source: string
+  title: string
+  body: string
 }
 
 export type Tag = '' | 'In reel' | 'Your usual' | 'Cheaper' | 'Bigger pack' | 'Popular'

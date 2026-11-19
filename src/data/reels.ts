@@ -6,8 +6,8 @@ export const REELS: Record<ReelId, Reel> = {
   beauty: {
     id: 'beauty',
     type: 'shop',
-    ha: 'Found ',
-    hi: '5 things',
+    ha: "Here's what we ",
+    hi: 'found',
     hb: ' in your reel',
     sub: '5 products identified',
     msg: 'Swipe for swaps, or ask me anything about these.',
@@ -52,8 +52,8 @@ export const REELS: Record<ReelId, Reel> = {
   one: {
     id: 'one',
     type: 'shop',
-    ha: 'Found ',
-    hi: '1 thing',
+    ha: "Here's what we ",
+    hi: 'found',
     hb: ' in your reel',
     sub: '1 product identified',
     msg: 'Swipe for a swap, or ask me anything about it.',
