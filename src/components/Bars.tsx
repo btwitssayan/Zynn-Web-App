@@ -1,7 +1,8 @@
 import { DotLottieReact } from '@lottiefiles/dotlottie-react'
-import { motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
+import ClickSpark from './ClickSpark'
 import { Icon } from './Icon'
 import { LiquidGlassCard } from './ui/liquid-glass'
 
@@ -137,8 +138,12 @@ interface ChatBarProps {
 }
 
 export function ChatBar({ hints, onSubmit, disabled, gradient }: ChatBarProps) {
+  const reduce = useReducedMotion()
   const [value, setValue] = useState('')
   const [i, setI] = useState(0)
+  // Bumped on every send; re-keys the arrow so the old one launches out the
+  // top and a fresh one springs up from below.
+  const [sent, setSent] = useState(0)
 
   useEffect(() => {
     if (hints.length < 2) return
@@ -154,6 +159,7 @@ export function ChatBar({ hints, onSubmit, disabled, gradient }: ChatBarProps) {
     if (!v || disabled) return
     onSubmit(v)
     setValue('')
+    setSent((n) => n + 1)
   }
 
   return (
@@ -182,33 +188,61 @@ export function ChatBar({ hints, onSubmit, disabled, gradient }: ChatBarProps) {
         </label>
       </LiquidGlassCard>
       <motion.div
+        className="shrink-0"
         animate={ready ? { y: -2, scale: 1 } : { y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15 }}
       >
-        <LiquidGlassCard
-          press={ready}
-          className={`cbar-send h-11 w-11 shrink-0${ready ? ' ready' : ''}`}
-          tint="var(--z-lens)"
-          borderRadius="999px"
-          distortion="sm"
+        {/* React Bits ClickSpark: a burst of brand-orange sparks on send. It sits
+            outside the glass card so the sparks can spill past the circle.
+            Enter in the input fires a synthetic click on the submit button, so
+            keyboard sends spark too. */}
+        <ClickSpark
+          className="h-11 w-11"
+          disabled={!ready}
+          sparkColor={['#f08a3c', '#f2a35e', '#ffd2a8']}
+          sparkCount={10}
+          sparkRadius={30}
+          sparkSize={9}
+          sparkWidth={2}
+          duration={480}
+          glow={0.6}
+          randomness={0.35}
+          ring
         >
-          <motion.button
-            type="submit"
-            className="rb h-full w-full"
-            aria-label="Send"
-            disabled={!ready}
-            whileHover={ready ? { scale: 1.08 } : {}}
-            whileTap={ready ? { scale: 0.92 } : {}}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          <LiquidGlassCard
+            press={ready}
+            className={`cbar-send h-11 w-11 shrink-0${ready ? ' ready' : ''}`}
+            tint="var(--z-lens)"
+            borderRadius="999px"
+            distortion="sm"
           >
-            <motion.div
-              animate={ready ? { rotate: 12 } : { rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            <motion.button
+              type="submit"
+              className="rb h-full w-full overflow-hidden"
+              aria-label="Send"
+              disabled={!ready}
+              whileHover={ready ? { scale: 1.08 } : {}}
+              whileTap={ready ? { scale: 0.92 } : {}}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             >
-              <Icon name="send" size={16} />
-            </motion.div>
-          </motion.button>
-        </LiquidGlassCard>
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.div
+                  key={sent}
+                  initial={reduce ? { opacity: 0 } : { y: 22, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1, rotate: ready ? 12 : 0 }}
+                  exit={
+                    reduce
+                      ? { opacity: 0, transition: { duration: 0.12 } }
+                      : { y: -26, opacity: 0, transition: { duration: 0.22, ease: EASE_OUT } }
+                  }
+                  transition={{ type: 'spring', stiffness: 260, damping: 18, delay: reduce ? 0 : 0.08 }}
+                >
+                  <Icon name="send" size={16} />
+                </motion.div>
+              </AnimatePresence>
+            </motion.button>
+          </LiquidGlassCard>
+        </ClickSpark>
       </motion.div>
     </form>
   )

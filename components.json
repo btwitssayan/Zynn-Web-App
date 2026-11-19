@@ -18,6 +18,7 @@
   },
   "registries": {
     "@react-bits": "https://reactbits.dev/r/{name}.json",
-    "@glasscn": "https://glasscn-components.vercel.app/r/{name}.json"
+    "@glasscn": "https://glasscn-components.vercel.app/r/{name}.json",
+    "@magicui": "https://magicui.design/r/{name}.json"
   }
 }
