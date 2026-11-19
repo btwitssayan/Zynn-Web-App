@@ -107,7 +107,7 @@ export function Drawer({ onClose }: { onClose: () => void }) {
             <span className="h3 flex-1">{app.user.name}</span>
           </div>
         ) : (
-          <div className="g mt-4 flex items-center gap-2.5 rounded-[20px] p-3">
+          <div className="drawer-login mt-4 flex items-center gap-2.5 rounded-[20px] p-3">
             <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl border border-ink/15 bg-[var(--z-well)]">
               <Icon name="user" size={18} className="text-z-tx" />
             </span>

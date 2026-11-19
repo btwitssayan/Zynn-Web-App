@@ -35,7 +35,7 @@ export function Placed() {
       </div>
       <div className="mt-10 px-5">
         {next && nextItems.length > 0 && (
-          <div className="g gc mb-3">
+          <div className="dk gc mb-3">
             <p className="h3">
               Next: {next} order · {nextItems.length} {nextItems.length === 1 ? 'item' : 'items'} ·{' '}
               {inr(billFor(next, nextItems).total)}
@@ -69,7 +69,7 @@ function AllPlaced() {
       </div>
       <div className="mt-8 px-5">
         {placed.map((o) => (
-          <Link key={o.id} to={`/track/${o.id}`} className="g gc mt-3 flex items-center gap-3 text-z-tx">
+          <Link key={o.id} to={`/track/${o.id}`} className="dk gc mt-3 flex items-center gap-3 text-z-tx">
             <span className="h3">{o.store}</span>
             <span className="s flex-1">· {inr(o.total)}</span>
             <StatusPill>Placed</StatusPill>
@@ -115,7 +115,7 @@ export function Track() {
           <p className="s">Zepto</p>
           <h1 className="h1 mt-1">Order confirmed</h1>
           <p className="mt-3.5 text-[30px] font-extrabold tracking-[-.6px] text-z-acc">Arriving in {mins} mins</p>
-          <div className="g gc mt-5">
+          <div className="dk gc mt-5">
             <span className="h3">Items ({order.items.length})</span>
             {order.items.map((it) => (
               <CartItemRow key={it.title} title={it.title} size={it.size} price={inr(it.price * it.qty)} qty={it.qty} mode="qty" />
@@ -126,7 +126,7 @@ export function Track() {
               <span>{inr(order.total)}</span>
             </div>
           </div>
-          <div className="g gc mt-3 flex items-start gap-3">
+          <div className="dk gc mt-3 flex items-start gap-3">
             <Icon name="help" />
             <p className="flex-1 text-sm leading-[1.45]">For help, go to Help in the Zepto app</p>
           </div>
@@ -156,7 +156,7 @@ export function Track() {
         <p className="s mt-1.5 text-sm">Picked up from the store</p>
         <p className="mt-3.5 text-[30px] font-extrabold tracking-[-.6px] text-z-acc">Arriving in {mins} mins</p>
 
-        <div className="g gc mt-5">
+        <div className="dk gc mt-5">
           <div className="flex items-start gap-3">
             <Icon name="store" />
             <div className="flex flex-1 flex-col gap-1">
@@ -197,7 +197,7 @@ export function Track() {
 
 function SwiggyHelp() {
   return (
-    <div className="g gc mt-3 flex items-start gap-3">
+    <div className="dk gc mt-3 flex items-start gap-3">
       <Icon name="phone" />
       <p className="flex-1 text-sm leading-[1.45]">
         Need to cancel or have an issue? Call Swiggy customer care{' '}
@@ -247,7 +247,7 @@ export function Orders() {
           {list.map((o) => {
           const count = o.items.reduce((s, it) => s + it.qty, 0)
           return (
-            <Link key={o.id} to={`/orders/${o.id}`} className="g gc mt-3 block text-z-tx">
+            <Link key={o.id} to={`/orders/${o.id}`} className="dk gc mt-3 block text-z-tx">
               <div className="flex items-center gap-3">
                 <span className="h3 flex-1">{o.store}</span>
                 <span className="xs">{formatWhen(o.createdAt)}</span>
@@ -307,7 +307,7 @@ export function OrderDetail() {
           </Link>
         )}
 
-        <div className="g gc mt-[18px]">
+        <div className="dk gc mt-[18px]">
           <span className="h3">Items ({o.items.length})</span>
           {o.items.map((it) => (
             <CartItemRow key={it.title} title={it.title} size={it.size} price={inr(it.price * it.qty)} qty={it.qty} mode="qty" />
@@ -316,7 +316,7 @@ export function OrderDetail() {
         <div className="mt-3">
           <BillCard rows={o.bill} total={inr(o.total)} totalLabel={cod ? 'To pay' : 'Total paid'} />
         </div>
-        <div className="g gc mt-3">
+        <div className="dk gc mt-3">
           <div className="flex items-center gap-3">
             <Icon name={cod ? 'cash' : 'upi'} />
             <span className="flex-1 text-sm">{cod ? 'Cash on delivery' : `Paid via ${o.payment.split(' · ')[0]}`}</span>
@@ -333,7 +333,7 @@ export function OrderDetail() {
         {o.store === 'Instamart' ? (
           <SwiggyHelp />
         ) : (
-          <div className="g gc mt-3 flex items-start gap-3">
+          <div className="dk gc mt-3 flex items-start gap-3">
             <Icon name="help" />
             <p className="flex-1 text-sm leading-[1.45]">For help, go to Help in the Zepto app</p>
           </div>

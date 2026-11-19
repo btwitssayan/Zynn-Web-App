@@ -5,7 +5,7 @@ import { inr2 } from '../lib/format'
 import { useApp } from '../store/AppStore'
 import { Icon } from './Icon'
 import { LiquidGlassCard } from './ui/liquid-glass'
-import { BottomSheet } from './Overlays'
+import { BottomSheet, InfoDialog } from './Overlays'
 import { CustomerReviews, ProductDescription, ZynnSays } from './ProductDetails'
 import { StoreOptionRow } from './StoreOptionRow'
 import { OnlineStores, type OnlineStore } from './OnlineStores'
@@ -22,6 +22,7 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
   const visit = (store: string) => app.toast(`Opening ${store}…`)
   const gallery = p.images?.length ? p.images : p.image ? [p.image] : []
   const [activeImage, setActiveImage] = useState(0)
+  const [info, setInfo] = useState<{ title: string; body: string } | null>(null)
 
   const handleGalleryScroll = (event: UIEvent<HTMLDivElement>) => {
     const scroller = event.currentTarget
@@ -100,7 +101,12 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
                 <button
                   className="pr-info"
                   aria-label="About quick delivery"
-                  onClick={() => app.toast('Added items check out on Instamart or Zepto')}
+                  onClick={() =>
+                    setInfo({
+                      title: 'Quick commerce',
+                      body: 'Add items to cart and check out through Instamart or Zepto. Delivery times and availability can vary by location.',
+                    })
+                  }
                 >
                   <Icon name="info" size={20} strokeWidth={2} />
                 </button>
@@ -132,14 +138,24 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
             stores={online}
             className="pd-store-section"
             onVisit={(store) => visit(store === 'Brand website' ? 'brand website' : store)}
-            onInfo={() => app.toast("You'll complete these purchases on the store's own website")}
+            onInfo={() =>
+              setInfo({
+                title: 'E-commerce prices',
+                body: "These prices come from the stores listed here. You'll complete the purchase on the store's own website.",
+              })
+            }
           />
 
           {p.zynnSays && (
             <ZynnSays
               text={p.zynnSays}
               relevance={p.relevance}
-              onInfo={() => app.toast('Zynn weighs your request, reviews and prices to pick this')}
+              onInfo={() =>
+                setInfo({
+                  title: 'How Zynn picks',
+                  body: 'Zynn weighs your request, review evidence, price, and availability to surface this product.',
+                })
+              }
             />
           )}
 
@@ -149,7 +165,12 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
             !!p.reviews?.length && (
               <CustomerReviews
                 reviews={p.reviews}
-                onInfo={() => app.toast('Reviews are collected from the stores listed above')}
+                onInfo={() =>
+                  setInfo({
+                    title: 'Customer reviews',
+                    body: 'Reviews are collected from the stores listed above and shown with their original source.',
+                  })
+                }
                 onReadAll={() => app.toast('Opening all reviews…')}
               />
             )
@@ -171,6 +192,11 @@ export function ProductSheet({ id, onClose }: { id: string; onClose: () => void 
           </LiquidGlassCard>
         </div>
       </div>
+      {info && (
+        <InfoDialog title={info.title} onClose={() => setInfo(null)}>
+          {info.body}
+        </InfoDialog>
+      )}
     </BottomSheet>
   )
 }

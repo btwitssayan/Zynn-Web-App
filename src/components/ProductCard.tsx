@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react'
 import { Icon } from './Icon'
+import { LiquidGlassCard } from './ui/liquid-glass'
 
 interface Props {
   title: string
@@ -35,15 +36,23 @@ export function ProductCard({ title, price, store, kind, image, saved, qty = 1, 
     >
       <div className={`ph relative text-xs ${image ? 'p-0' : 'p-6'}`} style={{ height: photoHeight }}>
         {image ? <img src={image} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" /> : title}
-        <button
-          className="rb absolute top-2.5 right-2.5 border border-white/50 bg-[rgba(60,60,67,.32)]"
-          style={{ color: saved ? '#FF4D61' : '#fff' }}
-          aria-label={saved ? 'Remove from favourites' : 'Save'}
-          aria-pressed={!!saved}
-          onClick={stop(on.onToggleSave)}
+        <LiquidGlassCard
+          press
+          className="absolute top-2.5 right-2.5 h-11 w-11"
+          borderRadius="999px"
+          distortion="sm"
+          tint="rgba(60,60,67,.18)"
         >
-          <Icon name="heart" fill={saved ? '#FF4D61' : 'none'} />
-        </button>
+          <button
+            className="rb !h-11 !w-11 border-0 bg-transparent"
+            style={{ color: saved ? 'var(--z-fav-media)' : '#fff' }}
+            aria-label={saved ? 'Remove from favourites' : 'Save'}
+            aria-pressed={!!saved}
+            onClick={stop(on.onToggleSave)}
+          >
+            <Icon name="heart" size={24} fill={saved ? 'var(--z-fav-media)' : 'none'} />
+          </button>
+        </LiquidGlassCard>
         {kind === 'oos' && (
           <span className="absolute top-2.5 left-2.5 rounded-full bg-[rgba(20,20,22,.88)] px-2.5 py-1.5 text-[11px] font-semibold text-z-tx">
             Out of stock

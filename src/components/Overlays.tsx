@@ -1,5 +1,6 @@
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { FocusScope } from '@radix-ui/react-focus-scope'
 import { Drawer } from 'vaul'
 import { useApp } from '../store/AppStore'
 import { Icon } from './Icon'
@@ -107,5 +108,75 @@ export function ToastHost() {
         </LiquidGlassCard>
       )}
     </div>
+  )
+}
+
+export function InfoDialog({
+  title,
+  children,
+  onClose,
+}: {
+  title: string
+  children: ReactNode
+  onClose: () => void
+}) {
+  // The parent mounts this component to open the dialog. A dismissal flips `closing` so the
+  // exit animation plays while still mounted, then unmounts via onClose once it has finished.
+  const [closing, setClosing] = useState(false)
+  const close = useCallback(() => setClosing(true), [])
+
+  useEffect(() => {
+    if (!closing) return
+    const t = setTimeout(onClose, 180)
+    return () => clearTimeout(t)
+  }, [closing, onClose])
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      // This sits above the Vaul sheet that opened it, so swallow the key: Escape closes the
+      // dialog, not the product sheet underneath it.
+      event.stopPropagation()
+      event.preventDefault()
+      close()
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [close])
+
+  // Vaul's sheet is modal: it sets `pointer-events: none` on <body> and dismisses itself on any
+  // pointerdown outside its content. This dialog is portaled to <body>, so it re-enables pointer
+  // events on itself (.info-dim / .info-dialog in index.css) and keeps pointerdown from reaching
+  // Vaul's document listener.
+  const keepInside = (event: { stopPropagation: () => void }) => event.stopPropagation()
+
+  return (
+    <Portal>
+      <div className={`dim info-dim${closing ? ' closing' : ''}`} onPointerDown={keepInside} onClick={close} />
+      {/* A nested trapped scope pauses the sheet's own focus trap while this is open — without it
+          Radix pulls focus straight back out of the dialog — and hands focus back to the info
+          button on unmount. `contents` keeps the wrapper out of the layout. */}
+      <FocusScope trapped loop className="contents">
+        <LiquidGlassCard
+          className={`info-dialog !fixed${closing ? ' closing' : ''}`}
+          borderRadius="26px"
+          distortion="md"
+          tint="var(--z-lens)"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="info-dialog-title"
+          onPointerDown={keepInside}
+          onClick={keepInside}
+        >
+          <div className="info-dialog-head">
+            <h2 id="info-dialog-title">{title}</h2>
+            <button className="info-dialog-close" aria-label="Close" onClick={close}>
+              <Icon name="close" size={17} strokeWidth={2.2} />
+            </button>
+          </div>
+          <p>{children}</p>
+        </LiquidGlassCard>
+      </FocusScope>
+    </Portal>
   )
 }

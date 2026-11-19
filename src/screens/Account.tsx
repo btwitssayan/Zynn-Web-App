@@ -38,7 +38,7 @@ export default function Account() {
         <p className="s mt-1">{maskPhone(app.user.phone)}</p>
       </div>
       <div className="mt-6 px-5">
-        <div className="g gc px-3 py-1">
+        <div className="dk gc px-3 py-1">
           {rows.map((r) => {
             const inner = (
               <>

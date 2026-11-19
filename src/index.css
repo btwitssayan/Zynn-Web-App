@@ -11,10 +11,16 @@
   --color-z-mut: var(--z-mut);
   --color-z-acc: var(--z-acc-tx);
   --color-z-err: var(--z-err);
+  --color-z-heart: var(--z-fav);
   --color-z-line: var(--z-line);
   --color-z-inv: var(--z-inv);
   --color-z-on-inv: var(--z-on-inv);
   --color-ink: rgb(var(--ink));
+}
+.drawer-login {
+  background: var(--z-panel);
+  border: 1px solid rgb(var(--ink) / 0.1);
+  box-shadow: 0 8px 24px var(--z-drop);
 }
 
 @theme {
@@ -23,7 +29,6 @@
   --color-z-lav: #98a5d8;
   --color-z-lavtag: #b7c0f0;
   --color-z-fill: #f2a35e;
-  --color-z-heart: #ff4d61;
   /* San Francisco everywhere. -apple-system picks SF Text / SF Display by
      size automatically; other platforms fall back to their system UI font
      (SF can't be licensed for web serving). */
@@ -31,7 +36,6 @@
   --font-tight: var(--font-sans);
   --font-serif: var(--font-sans);
 }
-
 @property --za {
   syntax: "<angle>";
   inherits: false;
@@ -69,6 +73,9 @@
   --z-inv-hover: #e4e4e8;
   --z-acc-tx: #f2a35e;
   --z-err: #e5807a;
+  --z-fav: #ff4d61; /* saved/favourite heart on app surfaces */
+  --z-fav-media: #ff4d61; /* the same heart over a photo scrim, where the surface never changes */
+  --z-fav-glow: rgba(255, 77, 97, 0.45);
   --z-good: #86efac;
   --z-good-bg: rgba(74, 222, 128, 0.14);
   --z-glass: rgba(30, 30, 34, 0.78);
@@ -76,6 +83,7 @@
   --z-lens: rgba(30, 30, 34, 0.55);
   --z-lens-solid: #1e1e22;
   --z-scrim: rgba(0, 0, 0, 0.62);
+  --z-scrim-soft: rgba(0, 0, 0, 0.46); /* over a sheet that should stay legible behind it */
   --z-drawer: rgba(0, 0, 0, 0.96);
   --z-drop: rgba(0, 0, 0, 0.45);
   --z-sk-a: #18181b;
@@ -109,6 +117,8 @@
     --z-inv-hover: #2c2c30;
     --z-acc-tx: #a8550f;
     --z-err: #c0392f;
+    --z-fav: #e0384d;
+    --z-fav-glow: rgba(224, 56, 77, 0.3);
     --z-good: #15803d;
     --z-good-bg: rgba(22, 163, 74, 0.12);
     --z-glass: rgba(255, 255, 255, 0.82);
@@ -116,6 +126,7 @@
     --z-lens: rgba(255, 255, 255, 0.6);
     --z-lens-solid: #fff;
     --z-scrim: rgba(20, 20, 26, 0.36);
+    --z-scrim-soft: rgba(20, 20, 26, 0.22);
     --z-drawer: rgba(250, 249, 247, 0.97);
     --z-drop: rgba(30, 30, 40, 0.12);
     --z-sk-a: #e8e6e2;
@@ -662,7 +673,7 @@
         height: 96px;
     }
     .pc .bd {
-        padding: 18px 10px 10px;
+        padding: 20px 10px 14px;
     }
     .pc .nm {
         font-size: 12px;
@@ -672,6 +683,9 @@
     .pc .st {
         font-size: 11px;
         line-height: 14px;
+    }
+    .pc .sz {
+        margin-top: 4px;
     }
     .pc .pr {
         font-size: 16px;
@@ -772,15 +786,10 @@
     z-index: 41;
     max-height: calc(100dvh - 44px);
     overflow-y: auto;
-    background: var(--z-lens);
-    -webkit-backdrop-filter: blur(24px) saturate(1.35);
-    backdrop-filter: blur(24px) saturate(1.35);
+    background: var(--z-bg);
     border-radius: 28px 28px 0 0;
     border-top: 1px solid rgb(var(--ink) / 0.12);
     padding: 10px 20px calc(34px + var(--safe-b));
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.16),
-      0 -12px 32px rgba(0, 0, 0, 0.18);
     /* Open/close animation and touch-action are handled by Vaul (see Overlays.tsx). */
   }
   .grab {
@@ -798,7 +807,7 @@
     z-index: 45;
     width: min(316px, 82vw);
     overflow-y: auto;
-    background: var(--z-lens);
+    background: var(--z-drawer);
     border-right: 1px solid rgb(var(--ink) / 0.12);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
     -webkit-backdrop-filter: blur(24px);
@@ -859,6 +868,89 @@
     font: 600 14px var(--font-sans);
     color: var(--z-tx);
     animation: zToast 0.3s var(--ease-out) both;
+  }
+  .info-dim {
+    z-index: 80;
+    /* Softer than the sheet scrim and blurred: the lens below needs something to refract,
+       and the product it explains should stay readable behind it. */
+    background: var(--z-scrim-soft);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    /* Portaled to <body>, which Vaul marks pointer-events: none while its sheet is open. */
+    pointer-events: auto;
+  }
+  .info-dim.closing {
+    animation: zFadeOut 0.18s ease-out both;
+  }
+  .info-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 81;
+    width: min(332px, calc(100vw - 48px));
+    padding: 20px 20px 22px;
+    transform: translate(-50%, -50%);
+    /* Elevation, rim and surface all come from the lens layers; adding a border or a second
+       shadow here would stack two depth systems. */
+    box-shadow: 0 24px 70px var(--z-drop);
+    pointer-events: auto;
+    /* Keeps the translate(-50%, -50%) centring intact — zToast's bare translateY dropped it
+       and made the dialog snap in from the wrong place. */
+    animation: zDialogIn 0.22s var(--ease-out) both;
+  }
+  .info-dialog:focus {
+    outline: none;
+  }
+  .info-dialog.closing {
+    animation: zDialogOut 0.16s ease-in both;
+    pointer-events: none;
+  }
+  .info-dialog-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .info-dialog h2 {
+    font: 700 19px/1.25 var(--font-sans);
+    letter-spacing: -0.025em;
+    color: var(--z-tx-strong);
+  }
+  .info-dialog p {
+    margin-top: 9px;
+    font: 400 15px/1.47 var(--font-sans);
+    letter-spacing: -0.004em;
+    color: var(--z-tx-2);
+    text-wrap: pretty;
+  }
+  .info-dialog-close {
+    position: relative;
+    display: grid;
+    width: 28px;
+    height: 28px;
+    flex: none;
+    place-items: center;
+    margin: -2px -4px 0 0;
+    border-radius: 50%;
+    background: rgb(var(--ink) / 0.09);
+    color: var(--z-tx-2);
+    transition:
+      background-color 140ms var(--ease-out),
+      color 140ms var(--ease-out),
+      transform 140ms var(--ease-out);
+  }
+  /* Keeps the visible dot small while the touch target stays thumb-sized. */
+  .info-dialog-close::after {
+    content: '';
+    position: absolute;
+    inset: -9px;
+  }
+  .info-dialog-close:hover {
+    background: rgb(var(--ink) / 0.16);
+    color: var(--z-tx-strong);
+  }
+  .info-dialog-close:active {
+    transform: scale(0.92);
   }
   .toast-tick {
     width: 26px;
@@ -1028,10 +1120,10 @@
     color: var(--z-mut-2);
   }
   .pd-store-section {
-    margin-top: 12px;
+    margin-top: 24px;
   }
   .pd-buy-note + .pd-store-section {
-    margin-top: 12px;
+    margin-top: 20px;
   }
   .pr-panel {
     background: var(--z-panel);
@@ -1737,7 +1829,7 @@
   .pc .bd {
     background: var(--z-surface);
     border-radius: 0 0 24px 24px;
-    padding: 18px 10px 10px;
+    padding: 20px 10px 14px;
   }
   .pc .nm {
     font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -1755,6 +1847,7 @@
     font: 400 11px/14px var(--font-sans);
     height: 14px;
     color: var(--z-mut);
+    margin-top: 4px;
   }
   .pc .pr {
     font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -2254,6 +2347,26 @@
 @keyframes zPop {
   from {
     transform: scale(0.4);
+    opacity: 0;
+  }
+}
+@keyframes zDialogIn {
+  from {
+    transform: translate(-50%, calc(-50% + 8px)) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes zDialogOut {
+  from {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, calc(-50% + 6px)) scale(0.97);
     opacity: 0;
   }
 }

@@ -44,7 +44,7 @@ function StoreCard({
   const on = app.connected[store]
   const info = STORE_INFO[store]
   return (
-    <div className={`g gc flex items-center gap-3 ${className}`}>
+    <div className={`dk gc flex items-center gap-3 ${className}`}>
       <StoreLogo letter={info.logo} />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="h3">{info.full}</span>
@@ -134,7 +134,7 @@ export function ConnectedStores() {
           </div>
         )}
         <p className="s mt-3.5">Logging out disconnects Zynn from that store account.</p>
-        <div className="g gc mt-5 flex items-center gap-3">
+        <div className="dk gc mt-5 flex items-center gap-3">
           <Icon name="info" className="text-z-acc" />
           <span className="flex-1 text-sm">Shopify stores need no login.</span>
         </div>

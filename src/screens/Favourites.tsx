@@ -42,9 +42,9 @@ export default function Favourites() {
       <TopBar inner />
       <div className="px-5 pt-4">
         <p className="s">Your favourites</p>
-        <div className="mt-1 flex items-center gap-2">
+        <div className="mt-1 flex items-center gap-3">
           <h1 className="h1">Saved for later</h1>
-          <Icon name="heart" size={26} fill="#FF4D61" style={{ color: '#FF4D61' }} />
+          <Icon name="heart" size={21} strokeWidth={1.6} fill="currentColor" className="text-z-heart" />
         </div>
         <div className="mt-5 grid grid-cols-2 gap-3">
           {app.favourites.map((id) => {
@@ -61,6 +61,7 @@ export default function Favourites() {
                 image={p.image}
                 qty={qty}
                 saved
+                className="favourite-card"
                 photoHeight={150}
                 onOpen={() => setSheet(id)}
                 onAdd={() => app.add(id)}

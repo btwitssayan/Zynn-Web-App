@@ -21,7 +21,7 @@ export function ChooseAddress() {
       <div className="px-5 pt-3">
         <h1 className="h1">Deliver to</h1>
         {stores.length > 1 && (
-          <div className="g mt-[18px] flex gap-1 rounded-full p-1" role="tablist">
+          <div className="mt-[18px] flex gap-1 rounded-full border border-ink/8 bg-z-surface-2 p-1" role="tablist">
             {stores.map((s) =>
               s === tab ? (
                 <button key={s} role="tab" aria-selected className="btn sm h-10 flex-1">
@@ -45,7 +45,7 @@ export function ChooseAddress() {
                 role="radio"
                 aria-checked={on}
                 onClick={() => app.selectAddress(tab, a.id)}
-                className={`g gc mt-3 flex w-full items-start gap-3 text-left ${on ? 'z-sel' : ''}`}
+                className={`dk gc mt-3 flex w-full items-start gap-3 text-left ${on ? 'z-sel' : ''}`}
               >
                 <span className={`rad mt-px ${on ? 'on' : ''}`} />
                 <span className="flex flex-col gap-1">
@@ -141,7 +141,7 @@ export function AddAddress() {
           </span>
           <button
             onClick={locate}
-            className="g absolute bottom-3.5 left-1/2 flex h-11 -translate-x-1/2 items-center gap-2 rounded-full px-4 text-[13px] font-semibold whitespace-nowrap text-z-tx"
+            className="absolute bottom-3.5 left-1/2 flex h-11 -translate-x-1/2 items-center gap-2 rounded-full border border-ink/8 bg-z-surface px-4 text-[13px] font-semibold whitespace-nowrap text-z-tx"
           >
             <Icon name="locate" size={18} />
             Use my current location
@@ -200,7 +200,7 @@ export function AddressBook() {
         {STORES.map((s) => (
           <Fragment key={s}>
             <p className="cap mt-[22px] mb-2.5">{s}</p>
-            <div className="g gc px-4 py-1">
+            <div className="dk gc px-4 py-1">
               {app.addresses[s].map((a) => (
                 <div key={a.id} className="flex items-start gap-3 border-b border-ink/8 py-3">
                   <Icon name="pin" className="mt-0.5" />
