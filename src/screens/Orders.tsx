@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router'
 import { BillCard, CartItemRow, EmptyState, StatusPill, Tick } from '../components/Bits'
+import { Celebrate } from '../components/Celebrate'
 import { Icon } from '../components/Icon'
 import { TopBar } from '../components/TopBar'
+import { NumberTicker } from '../components/ui/number-ticker'
 import type { Order } from '../data/types'
 import { billFor } from '../lib/bill'
 import { formatWhen, inr } from '../lib/format'
@@ -26,6 +28,7 @@ export function Placed() {
 
   return (
     <div className="scr pb-10">
+      {!next && <Celebrate />}
       <div className="flex flex-col items-center px-7 pt-[140px] text-center">
         <Tick />
         <h2 className="h2 mt-7">{order.store} order placed successfully.</h2>
@@ -63,6 +66,7 @@ function AllPlaced() {
   const placed = app.sessionOrders.map((id) => app.orders.find((o) => o.id === id)).filter((o): o is Order => !!o)
   return (
     <div className="scr pb-10">
+      <Celebrate />
       <div className="flex flex-col items-center px-7 pt-40 text-center">
         <Tick />
         <h1 className="h1 mt-7">{placed.length === 2 ? 'Both orders placed' : 'All orders placed'}</h1>
@@ -114,7 +118,7 @@ export function Track() {
         <div className="px-5 pt-3">
           <p className="s">Zepto</p>
           <h1 className="h1 mt-1">Order confirmed</h1>
-          <p className="mt-3.5 text-[30px] font-extrabold tracking-[-.6px] text-z-acc">Arriving in {mins} mins</p>
+          <p className="mt-3.5 text-[30px] font-extrabold tracking-[-.6px] text-z-acc">Arriving in <NumberTicker value={mins} /> mins</p>
           <div className="dk gc mt-5">
             <span className="h3">Items ({order.items.length})</span>
             {order.items.map((it) => (
@@ -142,7 +146,7 @@ export function Track() {
         <div className="relative aspect-[350/220] overflow-hidden rounded-3xl border border-ink/8 bg-z-surface-2">
           <svg viewBox="0 0 350 220" className="absolute inset-0 h-full w-full" aria-hidden="true">
             <path d="M-10 60H360M-10 160H360M90 -10V230M250 -10V230M0 230L180 -10" style={{ stroke: 'var(--z-map-road)' }} strokeWidth="12" fill="none" />
-            <path d="M60 52H250V150H292" stroke="#F2A35E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <path className="route-draw" pathLength={1} d="M60 52H250V150H292" stroke="#F2A35E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
           </svg>
           <span className="g absolute top-[14.5%] left-[11.4%] flex h-10 w-10 items-center justify-center rounded-full bg-[var(--z-glass-strong)]">
             <Icon name="store" size={18} />
@@ -154,7 +158,7 @@ export function Track() {
         </div>
         <h1 className="h1 mt-[22px]">Your order is on the way</h1>
         <p className="s mt-1.5 text-sm">Picked up from the store</p>
-        <p className="mt-3.5 text-[30px] font-extrabold tracking-[-.6px] text-z-acc">Arriving in {mins} mins</p>
+        <p className="mt-3.5 text-[30px] font-extrabold tracking-[-.6px] text-z-acc">Arriving in <NumberTicker value={mins} /> mins</p>
 
         <div className="dk gc mt-5">
           <div className="flex items-start gap-3">

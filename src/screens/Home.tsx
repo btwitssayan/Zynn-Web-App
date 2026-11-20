@@ -3,6 +3,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { CartBar, ChatBar, CollapsePill, GroupHeader } from '../components/Bars'
 import { SkeletonCard } from '../components/Bits'
+import BlurText from '../components/BlurText'
+import ShinyText from '../components/ShinyText'
+import { NumberTicker } from '../components/ui/number-ticker'
+import { useCssVar } from '../hooks/use-css-var'
 import { Drawer } from '../components/Drawer'
 import { Icon } from '../components/Icon'
 import { ProductCardV2, type CardKind } from '../components/ProductCardV2'
@@ -28,6 +32,8 @@ export default function Home({ reelId }: { reelId: ReelId }) {
     () => new Set(reel.groups.flatMap((g) => g.cards.filter((c) => c.picked).map((c) => c.id))),
   )
   const groupsRef = useRef<HTMLDivElement>(null)
+  const mutColor = useCssVar('--z-mut', '#8e8e93')
+  const strongColor = useCssVar('--z-tx-strong', '#ffffff')
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 1100)
@@ -84,18 +90,32 @@ export default function Home({ reelId }: { reelId: ReelId }) {
           hey {app.user?.name ?? 'there'} <Icon name="wave" size={15} className="inline-block align-[-2.5px]" />
         </p>
         <div className="flex items-start justify-between gap-2">
-          <h1 className="hd">
-            {head.ha}
-            <i className={head.hi === 'found' ? 'found' : undefined}>{head.hi}</i>
-            {head.hb}
-          </h1>
-          <Icon name="sparkle" size={22} className="mt-1 shrink-0 text-z-mut" />
+          {loading ? (
+            // React Bits ShinyText: a sheen sweeps the line while Zynn reads.
+            <h1 className="hd" aria-live="polite">
+              <ShinyText
+                text={`${head.ha}${head.hi}${head.hb}`}
+                color={mutColor}
+                shineColor={strongColor}
+                speed={1.6}
+                shineWidth={36}
+              />
+            </h1>
+          ) : (
+            // Results land with a focus pull: the line resolves out of blur.
+            <h1 className="hd hd-in" aria-live="polite">
+              {head.ha}
+              <i className={head.hi === 'found' ? 'found' : undefined}>{head.hi}</i>
+              {head.hb}
+            </h1>
+          )}
+          <Icon name="sparkle" size={22} className={`mt-1 shrink-0 text-z-mut${loading ? ' spk-think' : ' spk-done'}`} />
         </div>
-        {head.sub && <p className="sb">{head.sub}</p>}
+        {head.sub && <Sub text={head.sub} counting={!loading} />}
         {!loading && isRecipe && (
           <div className="mt-2.5 flex items-center gap-3">
             <button className="btn sm" disabled={!picked.size} onClick={() => app.addMany([...picked])}>
-              Add all picks · {inr(pickedTotal)}
+              Add all picks · <NumberTicker value={pickedTotal} format={inr} />
             </button>
             <span className="s">Tap a pack to switch</span>
           </div>
@@ -110,9 +130,9 @@ export default function Home({ reelId }: { reelId: ReelId }) {
                 <div className="sk h-4 w-[150px]" />
               </div>
               <div className="flex gap-2.5 overflow-hidden pt-2 pl-5">
-                <SkeletonCard />
-                <SkeletonCard />
-                <SkeletonCard />
+                <SkeletonCard index={k * 3} />
+                <SkeletonCard index={k * 3 + 1} />
+                <SkeletonCard index={k * 3 + 2} />
               </div>
             </section>
           ))}
@@ -159,7 +179,19 @@ export default function Home({ reelId }: { reelId: ReelId }) {
         </div>
       )}
 
-      {!loading && reel.msg && <p className="t mt-6 px-5 text-sm leading-5">{reel.msg}</p>}
+      {!loading && reel.msg && (
+        // React Bits BlurText: Zynn's note settles in word by word, like it's being said.
+        <BlurText
+          key={reel.msg}
+          text={reel.msg}
+          className="t mt-6 px-5 text-sm leading-5"
+          delay={45}
+          blur={6}
+          distance={8}
+          direction="bottom"
+          stepDuration={0.3}
+        />
+      )}
 
       {!loading && reel.chips.length > 0 && (
         <div className="chips mt-2.5 px-5">
@@ -203,6 +235,18 @@ export default function Home({ reelId }: { reelId: ReelId }) {
       {sheet && <ProductSheet id={sheet} onClose={() => setSheet(null)} />}
       {menu && <Drawer onClose={() => setMenu(false)} />}
     </div>
+  )
+}
+
+/** "5 products identified": the count ticks up from zero as results land. */
+function Sub({ text, counting }: { text: string; counting: boolean }) {
+  const m = counting ? /^(\d+)(\s.*)$/.exec(text) : null
+  if (!m) return <p className="sb">{text}</p>
+  return (
+    <p className="sb">
+      <NumberTicker value={Number(m[1])} startValue={0} delay={0.15} />
+      {m[2]}
+    </p>
   )
 }
 

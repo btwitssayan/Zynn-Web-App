@@ -2,7 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 import { ChatBar } from '../components/Bars'
 import { Icon } from '../components/Icon'
+import ShinyText from '../components/ShinyText'
 import { TopBar } from '../components/TopBar'
+import { BlurFade } from '../components/ui/blur-fade'
+import { useCssVar } from '../hooks/use-css-var'
 import { replyFor } from '../data/chat'
 import { bestOffer, PRODUCTS } from '../data/products'
 import { inr } from '../lib/format'
@@ -23,6 +26,8 @@ export default function Chat() {
   const [typing, setTyping] = useState(false)
   const sentInitial = useRef(false)
   const endRef = useRef<HTMLDivElement>(null)
+  const mutColor = useCssVar('--z-mut', '#8e8e93')
+  const strongColor = useCssVar('--z-tx-strong', '#ffffff')
 
   const send = useCallback(
     (text: string) => {
@@ -71,10 +76,12 @@ export default function Chat() {
           <div className="mt-7">
             <p className="h2">{product ? 'Ask about this product' : 'What are you shopping for?'}</p>
             <div className="chips mt-4">
-              {suggestions.map((s) => (
-                <button key={s} className="chip" onClick={() => send(s)}>
-                  {s}
-                </button>
+              {suggestions.map((s, i) => (
+                <BlurFade key={s} delay={0.08 + i * 0.06} direction="up" offset={8}>
+                  <button className="chip" onClick={() => send(s)}>
+                    {s}
+                  </button>
+                </BlurFade>
               ))}
             </div>
           </div>
@@ -86,26 +93,34 @@ export default function Chat() {
               <div className="max-w-[260px] rounded-[22px_22px_6px_22px] bg-z-surface-2 px-4 py-3 text-[15px] font-semibold text-z-tx">{m.lines[0]}</div>
             </div>
           ) : (
-            <div key={i} className="mt-6 flex flex-col gap-1.5" style={{ animation: 'zIn .35s ease-out both' }}>
-              {m.lines.map((l) => (
-                <p key={l} className="t">
-                  {l}
-                </p>
+            // Magic UI BlurFade: each line of Zynn's reply resolves in turn.
+            <div key={i} className="mt-6 flex flex-col gap-1.5">
+              {m.lines.map((l, li) => (
+                <BlurFade key={l} delay={li * 0.14} direction="up" offset={6} duration={0.45}>
+                  <p className="t">{l}</p>
+                </BlurFade>
               ))}
             </div>
           ),
         )}
 
         {typing && (
-          <div className="typing" role="status" aria-label="Zynn is typing">
+          <div className="typing" role="status" aria-label="Zynn is thinking">
             <i />
             <i />
             <i />
+            <ShinyText
+              text="Zynn is thinking"
+              className="ml-2 text-[13px] font-medium"
+              color={mutColor}
+              shineColor={strongColor}
+              speed={1.4}
+            />
           </div>
         )}
 
         {last?.from === 'zynn' && !typing && (
-          <div className="chips mt-[18px]">
+          <BlurFade className="chips mt-[18px]" delay={0.1 + (last.lines.length - 1) * 0.14} direction="up" offset={8}>
             {product && offer && (
               <button className="chip" onClick={() => app.add(product.id)}>
                 <Icon name="plus" size={16} />
@@ -115,7 +130,7 @@ export default function Chat() {
             <button className="chip" onClick={() => nav('/')}>
               See other options
             </button>
-          </div>
+          </BlurFade>
         )}
         <div ref={endRef} />
       </div>

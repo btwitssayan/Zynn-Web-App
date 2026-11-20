@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { inr2 } from '../lib/format'
 import { Icon } from './Icon'
+import { ZynnSpark } from './ProductDetails'
 import { StoreLogo } from './StoreLogo'
 import { Price, StoreOptionRow } from './StoreOptionRow'
 
@@ -35,11 +36,15 @@ export function OnlineStores({
   return (
     <section className={`pr-panel ${className}`} aria-label="E-commerce">
       <header className="pr-head">
-        <span className="pr-label">{`Found at ${count} store${count === 1 ? '' : 's'}`}</span>
+        <span className="pr-label pr-label-zynn">
+          <ZynnSpark className="pr-spark" />
+          <span className="pr-zynn-text">{`Zynn compared ${count} store${count === 1 ? '' : 's'}`}</span>
+        </span>
         <button className="pr-info" aria-label="About online prices" onClick={onInfo}>
           <Icon name="info" size={20} strokeWidth={2} />
         </button>
       </header>
+      <p className="pr-fresh">Checked just now</p>
 
       <div className="pr-lead">
         <div className="pr-lead-copy">

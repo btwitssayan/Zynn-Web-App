@@ -11,13 +11,20 @@ function Rich({ text }: { text: string }) {
   )
 }
 
+/** Zynn's sparkle mark: the visual signature for "this is Zynn's own work", reused anywhere Zynn is visibly doing something (rationale, price comparison). */
+export function ZynnSpark({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={`zs-spark ${className}`} aria-hidden="true">
+      <path d="M12 2c.6 4.9 3.1 7.4 8 8-4.9.6-7.4 3.1-8 8-.6-4.9-3.1-7.4-8-8 4.9-.6 7.4-3.1 8-8z" />
+    </svg>
+  )
+}
+
 function CardHead({ title, onInfo, infoLabel }: { title: string; onInfo: () => void; infoLabel: string }) {
   return (
     <div className="zs-head">
       <h3 className="zs-title">
-        <svg viewBox="0 0 24 24" className="zs-spark" aria-hidden="true">
-          <path d="M12 2c.6 4.9 3.1 7.4 8 8-4.9.6-7.4 3.1-8 8-.6-4.9-3.1-7.4-8-8 4.9-.6 7.4-3.1 8-8z" />
-        </svg>
+        <ZynnSpark />
         <span>{title}</span>
       </h3>
       <button className="zs-info" aria-label={infoLabel} onClick={onInfo}>

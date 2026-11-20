@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { PillKind } from '../data/types'
 import { Icon, type IconName } from './Icon'
+import { BorderBeam } from './ui/border-beam'
 
 export function BillCard({
   rows,
@@ -157,15 +158,27 @@ export function StatusPill({ kind = 'placed', children }: { kind?: PillKind; chi
   )
 }
 
-export function SkeletonCard() {
+/** A card-shaped placeholder while Zynn reads the reel. A Magic UI border beam
+ *  in the brand colours traces each card's edge: the scan in progress. `index`
+ *  offsets each beam so the row reads as one sweeping pass, not lockstep. */
+export function SkeletonCard({ index = 0 }: { index?: number }) {
   return (
-    <div className="skc">
+    <div className="skc relative">
       <div className="sk h-24 rounded-none" />
       <div className="px-2.5 py-[18px]">
         <div className="sk h-3 w-[90%]" />
         <div className="sk mt-2 h-3 w-[60%]" />
         <div className="sk mt-3.5 h-[18px] w-[45%]" />
       </div>
+      <BorderBeam
+        size={120}
+        duration={2.4}
+        delay={index * 0.5}
+        borderWidth={2}
+        colorFrom="#f08a3c"
+        colorTo="#98a5d8"
+        className="skc-beam"
+      />
     </div>
   )
 }

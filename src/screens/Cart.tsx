@@ -3,6 +3,7 @@ import { CartItemRow, EmptyState, Note } from '../components/Bits'
 import { Icon } from '../components/Icon'
 import { SlideToCheckout } from '../components/SlideToCheckout'
 import { TopBar } from '../components/TopBar'
+import { NumberTicker } from '../components/ui/number-ticker'
 import { offerFor, PRODUCTS, storeLabel, displayPrice } from '../data/products'
 import { STORES } from '../data/types'
 import { MIN_ORDER } from '../lib/bill'
@@ -45,7 +46,7 @@ export default function Cart() {
       <div className="px-5 pt-3">
         <h1 className="h1">Your cart</h1>
         <p className="s mt-1.5">
-          {app.cartCount} {app.cartCount === 1 ? 'item' : 'items'} · {inr(app.cartTotal)}
+          {app.cartCount} {app.cartCount === 1 ? 'item' : 'items'} · <NumberTicker value={app.cartTotal} format={inr} />
         </p>
 
         {groups.map((g, i) => (
@@ -85,7 +86,9 @@ export default function Cart() {
             <div className="hr mt-1" />
             <div className="kv mt-1.5">
               <span className="mut">Item total</span>
-              <b>{inr(g.total)}</b>
+              <b>
+                <NumberTicker value={g.total} format={inr} />
+              </b>
             </div>
           </div>
         ))}

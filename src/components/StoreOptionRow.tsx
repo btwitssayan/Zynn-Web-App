@@ -4,9 +4,17 @@ import { Icon } from './Icon'
 interface Props {
   store: string
   price: string
+  /** Pre-formatted, struck-through list price; shown with savingsPct when the offer carries a discount. */
+  mrp?: string
+  /** Whole-number percent saved vs. mrp. */
+  savingsPct?: number
+  /** Pre-formatted qty × price total; shown only while qty > 1. */
+  subtotal?: string
   kind: 'add' | 'added' | 'visit' | 'fb'
   eta?: string
   lowest?: boolean
+  /** Whether the user is logged into this store inside Zynn. Quick-commerce rows only; defaults to true for rows (visit/fb) where connection doesn't apply. */
+  connected?: boolean
   /** Kept for API compatibility; rows are divided by the panel. */
   line?: boolean
   logo?: string
@@ -47,7 +55,21 @@ export function Price({ value, className = '' }: { value: string; className?: st
  * price and delivery time under the name with a cart control; online rows
  * (visit / fb) are compact and open the store's site.
  */
-export function StoreOptionRow({ store, price, kind, eta, lowest, logo, qty = 1, max = 9, ...on }: Props) {
+export function StoreOptionRow({
+  store,
+  price,
+  mrp,
+  savingsPct,
+  subtotal,
+  kind,
+  eta,
+  lowest,
+  connected = true,
+  logo,
+  qty = 1,
+  max = 9,
+  ...on
+}: Props) {
   if (kind === 'visit' || kind === 'fb') {
     return (
       <div className="pr-row pr-row-sm">
@@ -72,12 +94,24 @@ export function StoreOptionRow({ store, price, kind, eta, lowest, logo, qty = 1,
       <span className="pr-copy">
         <span className="pr-name-line">
           <span className="pr-name">{store}</span>
-          {lowest && <span className="pr-best">Best price</span>}
+          {lowest && <span className="pr-best">Best · connected</span>}
+          {!connected && <span className="pr-notconn">Not connected</span>}
         </span>
         <span className="pr-price-line">
           <Price value={price} className="pr-amt" />
           {eta && <span className="pr-eta">{eta}</span>}
         </span>
+        {mrp && (
+          <span className="pr-mrp-line">
+            <span className="pr-mrp-strike">{mrp}</span>
+            {savingsPct != null && <span className="pr-mrp-pct">{savingsPct}% off</span>}
+          </span>
+        )}
+        {subtotal && (
+          <span className="pr-line-total">
+            {qty} × {price} = {subtotal}
+          </span>
+        )}
       </span>
 
       {kind === 'add' && (
